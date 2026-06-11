@@ -5,6 +5,13 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "splitpay",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "userInterfaceStyle": "automatic"
+    },
+    "android": {
+      "userInterfaceStyle": "automatic"
+    },
     "web": {
       "bundler": "metro"
     },

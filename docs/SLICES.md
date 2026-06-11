@@ -2,7 +2,7 @@
 
 Micro-slices for gradual, test-driven development.
 
-**Next slice:** [S12 — Navigation stubs](./ROADMAP.md#app-shell--s11s13) (see [`ROADMAP.md`](./ROADMAP.md) for full plan)
+**Next slice:** [S13 — AsyncStorage device ID](./ROADMAP.md#app-shell--s11s13) (see [`ROADMAP.md`](./ROADMAP.md) for full plan)
 
 **How we work:** [`PROCESS.md`](./PROCESS.md)
 
@@ -22,11 +22,12 @@ Micro-slices for gradual, test-driven development.
 | [S9](slices/S09-compute-settlements.md)    | Greedy settlement matching              |
 | [S10](slices/S10-is-payment.md)            | Payment expense detection               |
 | [S11](slices/S11-expo-web-shell.md)        | Expo web + Paper M3 shell               |
+| [S12](slices/S12-navigation-stubs.md)      | React Navigation stack + screen stubs   |
 | [Prep](slices/prep-roadmap-and-process.md) | Roadmap, process, ADRs                  |
 
 ## Upcoming
 
-See [`ROADMAP.md`](./ROADMAP.md) — **S12** (Navigation) through **S28** (Join UI).
+See [`ROADMAP.md`](./ROADMAP.md) — **S13** (AsyncStorage) through **S28** (Join UI).
 
 ## Verify
 

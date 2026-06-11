@@ -1,38 +1,24 @@
 import { LEDGER_READY } from "@splitpay/ledger";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, useColorScheme } from "react-native";
-import { PaperProvider, Text } from "react-native-paper";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { PaperProvider } from "react-native-paper";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { getTheme } from "./src/lib/theme";
+import { AppNavigator } from "./src/navigation/AppNavigator";
+import { getThemes } from "./src/lib/theme";
+import { useAppColorScheme } from "./src/lib/use-app-color-scheme";
 
 void LEDGER_READY;
 
 export default function App() {
-  const colorScheme = useColorScheme();
-  const theme = getTheme(colorScheme);
+  const colorScheme = useAppColorScheme();
+  const { paper, navigation } = getThemes(colorScheme);
 
   return (
     <SafeAreaProvider>
-      <PaperProvider theme={theme}>
-        <SafeAreaView
-          style={[
-            styles.container,
-            { backgroundColor: theme.colors.background },
-          ]}
-        >
-          <Text variant="headlineMedium">SplitPay</Text>
-          <StatusBar style="auto" />
-        </SafeAreaView>
+      <PaperProvider theme={paper}>
+        <AppNavigator navigationTheme={navigation} />
+        <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
       </PaperProvider>
     </SafeAreaProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
