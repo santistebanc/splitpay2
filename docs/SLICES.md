@@ -2,7 +2,7 @@
 
 Micro-slices for gradual, test-driven development.
 
-**Next slice:** [S11 — Expo web shell](./ROADMAP.md#app-shell--s11s13) (see [`ROADMAP.md`](./ROADMAP.md) for full plan)
+**Next slice:** [S12 — Navigation stubs](./ROADMAP.md#app-shell--s11s13) (see [`ROADMAP.md`](./ROADMAP.md) for full plan)
 
 **How we work:** [`PROCESS.md`](./PROCESS.md)
 
@@ -21,11 +21,12 @@ Micro-slices for gradual, test-driven development.
 | [S8](slices/S08-empty-allocations.md)      | Empty allocations → snapshot members    |
 | [S9](slices/S09-compute-settlements.md)    | Greedy settlement matching              |
 | [S10](slices/S10-is-payment.md)            | Payment expense detection               |
+| [S11](slices/S11-expo-web-shell.md)        | Expo web + Paper M3 shell               |
 | [Prep](slices/prep-roadmap-and-process.md) | Roadmap, process, ADRs                  |
 
 ## Upcoming
 
-See [`ROADMAP.md`](./ROADMAP.md) — **S11** (Expo + Paper M3) through **S28** (Join UI).
+See [`ROADMAP.md`](./ROADMAP.md) — **S12** (Navigation) through **S28** (Join UI).
 
 ## Verify
 

@@ -37,8 +37,8 @@ See [`SLICES.md`](./SLICES.md) for links to completed slice summaries.
 
 | Slice   | Status      | Summary                                     | Exit criteria                                |
 | ------- | ----------- | ------------------------------------------- | -------------------------------------------- |
-| **S11** | 🔜 **Next** | Expo web + Paper M3 + system light/dark     | `npm run web` renders themed shell           |
-| S12     | ⏳          | React Navigation stack + empty screen stubs | Navigate between route stubs                 |
+| S11     | ✅          | Expo web + Paper M3 + system light/dark     | `npm run web` renders themed shell           |
+| **S12** | 🔜 **Next** | React Navigation stack + empty screen stubs | Navigate between route stubs                 |
 | S13     | ⏳          | AsyncStorage: device ID + known groups list | Reload preserves device ID; Vitest mock test |
 
 ---
