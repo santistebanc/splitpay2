@@ -1,0 +1,37 @@
+---
+description: SplitPay slice workflow — read roadmap first, TDD, verify, handoff
+alwaysApply: true
+---
+
+# SplitPay development
+
+## New session — read before coding
+
+1. `docs/SLICES.md` — done vs **Next**
+2. `docs/ROADMAP.md` — full plan and exit criteria
+3. `docs/PROCESS.md` — TDD, verify gate, commit rules
+4. `CONTEXT.md` — domain vocabulary (Contribution, Allocation, etc.)
+5. Latest `docs/slices/*.md` — last handoff
+
+Do not rely on chat history for slice order or architecture. Use `docs/adr/` for why.
+
+## Working a slice
+
+- Build only the **Next** slice in `ROADMAP.md` unless the user names another
+- **Vertical TDD**: one failing test → minimal code → `npm run verify` green
+- **Autofix** until `npm run verify` passes before handoff
+- Post **slice summary first** (see `docs/PROCESS.md` template), then point at code
+- **Commit** only when the user says `confirmed` (one commit per slice)
+
+## Code style
+
+- Simple, readable, no middlemen — see `docs/PROCESS.md`
+- App code by screen: `apps/mobile/src/screens/`
+- Ledger stays pure in `packages/ledger/`
+
+## User commands
+
+| Command | Meaning |
+|---------|---------|
+| `next` | Start the Next slice from ROADMAP |
+| `confirmed` | Slice accepted → git commit |
