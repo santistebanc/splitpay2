@@ -2,7 +2,7 @@
 
 Micro-slices for gradual, test-driven development. Each slice has a summary in `docs/slices/`.
 
-**Current slice:** S7 — Rounding
+**Current slice:** S8 — Empty allocations
 
 | Slice                                 | Status  | Summary                               |
 | ------------------------------------- | ------- | ------------------------------------- |
@@ -14,6 +14,7 @@ Micro-slices for gradual, test-driven development. Each slice has a summary in `
 | [S5](slices/S05-ledger-types.md)      | ✅ Done | Ledger types for pure math            |
 | [S6](slices/S06-compute-balances.md)  | ✅ Done | computeBalances, one expense          |
 | [S7](slices/S07-rounding.md)          | ✅ Done | 100¢ ÷ 3 zero-sum rounding            |
+| [S8](slices/S08-empty-allocations.md) | ✅ Done | Empty allocations → snapshot members  |
 
 ## Verify
 

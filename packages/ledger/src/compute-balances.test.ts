@@ -52,4 +52,45 @@ describe("computeBalances", () => {
       { memberId: "alice", balanceCents: 67 },
     ]);
   });
+
+  it("empty allocations debit all members in the passed snapshot", () => {
+    const members: LedgerMember[] = [{ id: "alice" }, { id: "bob" }];
+
+    const expenses: LedgerExpense[] = [
+      {
+        id: "taxi",
+        amountCents: 1000,
+        contributions: [{ memberId: "alice", amountCents: 1000 }],
+        allocations: [],
+      },
+    ];
+
+    const balances = computeBalances(members, expenses);
+
+    expect(balances).toEqual([
+      { memberId: "bob", balanceCents: -500 },
+      { memberId: "alice", balanceCents: 500 },
+    ]);
+  });
+
+  it("empty allocations use the snapshot only, not a wider group roster", () => {
+    const membersAtExpenseTime: LedgerMember[] = [
+      { id: "alice" },
+      { id: "bob" },
+    ];
+
+    const expenses: LedgerExpense[] = [
+      {
+        id: "dinner",
+        amountCents: 900,
+        contributions: [{ memberId: "alice", amountCents: 900 }],
+        allocations: [],
+      },
+    ];
+
+    const balances = computeBalances(membersAtExpenseTime, expenses);
+
+    expect(balances.map((b) => b.memberId)).toEqual(["bob", "alice"]);
+    expect(balances.reduce((sum, b) => sum + b.balanceCents, 0)).toBe(0);
+  });
 });
