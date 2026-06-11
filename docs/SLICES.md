@@ -2,19 +2,20 @@
 
 Micro-slices for gradual, test-driven development. Each slice has a summary in `docs/slices/`.
 
-**Current slice:** S8 — Empty allocations
+**Current slice:** S9 — computeSettlements
 
-| Slice                                 | Status  | Summary                               |
-| ------------------------------------- | ------- | ------------------------------------- |
-| [S0](slices/S00-monorepo-skeleton.md) | ✅ Done | npm workspaces, ledger + mobile stubs |
-| [S1](slices/S01-tooling.md)           | ✅ Done | Prettier, Husky, lint-staged          |
-| [S2](slices/S02-vitest.md)            | ✅ Done | Vitest + test in verify               |
-| [S3](slices/S03-github-actions-ci.md) | ✅ Done | GitHub Actions CI                     |
-| [S4](slices/S04-context-glossary.md)  | ✅ Done | CONTEXT.md domain glossary            |
-| [S5](slices/S05-ledger-types.md)      | ✅ Done | Ledger types for pure math            |
-| [S6](slices/S06-compute-balances.md)  | ✅ Done | computeBalances, one expense          |
-| [S7](slices/S07-rounding.md)          | ✅ Done | 100¢ ÷ 3 zero-sum rounding            |
-| [S8](slices/S08-empty-allocations.md) | ✅ Done | Empty allocations → snapshot members  |
+| Slice                                   | Status  | Summary                               |
+| --------------------------------------- | ------- | ------------------------------------- |
+| [S0](slices/S00-monorepo-skeleton.md)   | ✅ Done | npm workspaces, ledger + mobile stubs |
+| [S1](slices/S01-tooling.md)             | ✅ Done | Prettier, Husky, lint-staged          |
+| [S2](slices/S02-vitest.md)              | ✅ Done | Vitest + test in verify               |
+| [S3](slices/S03-github-actions-ci.md)   | ✅ Done | GitHub Actions CI                     |
+| [S4](slices/S04-context-glossary.md)    | ✅ Done | CONTEXT.md domain glossary            |
+| [S5](slices/S05-ledger-types.md)        | ✅ Done | Ledger types for pure math            |
+| [S6](slices/S06-compute-balances.md)    | ✅ Done | computeBalances, one expense          |
+| [S7](slices/S07-rounding.md)            | ✅ Done | 100¢ ÷ 3 zero-sum rounding            |
+| [S8](slices/S08-empty-allocations.md)   | ✅ Done | Empty allocations → snapshot members  |
+| [S9](slices/S09-compute-settlements.md) | ✅ Done | Greedy settlement matching            |
 
 ## Verify
 
