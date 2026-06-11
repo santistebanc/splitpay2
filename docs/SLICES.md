@@ -2,7 +2,7 @@
 
 Micro-slices for gradual, test-driven development. Each slice has a summary in `docs/slices/`.
 
-**Current slice:** S9 — computeSettlements
+**Current slice:** S10 — isPayment
 
 | Slice                                   | Status  | Summary                               |
 | --------------------------------------- | ------- | ------------------------------------- |
@@ -16,6 +16,7 @@ Micro-slices for gradual, test-driven development. Each slice has a summary in `
 | [S7](slices/S07-rounding.md)            | ✅ Done | 100¢ ÷ 3 zero-sum rounding            |
 | [S8](slices/S08-empty-allocations.md)   | ✅ Done | Empty allocations → snapshot members  |
 | [S9](slices/S09-compute-settlements.md) | ✅ Done | Greedy settlement matching            |
+| [S10](slices/S10-is-payment.md)         | ✅ Done | Payment expense detection             |
 
 ## Verify
 
