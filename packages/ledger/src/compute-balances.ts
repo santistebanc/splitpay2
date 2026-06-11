@@ -5,6 +5,24 @@ export type LedgerBalance = {
   balanceCents: number;
 };
 
+/** Split amountCents evenly across allocationIds using integer cents (zero-sum). */
+function debitShares(
+  amountCents: number,
+  allocationIds: string[]
+): Map<string, number> {
+  const shares = new Map<string, number>();
+  const count = allocationIds.length;
+
+  for (let i = 0; i < count; i++) {
+    const memberId = allocationIds[i];
+    const previousTotal = Math.floor((amountCents * i) / count);
+    const currentTotal = Math.floor((amountCents * (i + 1)) / count);
+    shares.set(memberId, currentTotal - previousTotal);
+  }
+
+  return shares;
+}
+
 export function computeBalances(
   members: LedgerMember[],
   expenses: LedgerExpense[]
@@ -26,9 +44,9 @@ export function computeBalances(
       );
     }
 
-    const shareCents = expense.amountCents / allocationIds.length;
+    const shares = debitShares(expense.amountCents, allocationIds);
 
-    for (const memberId of allocationIds) {
+    for (const [memberId, shareCents] of shares) {
       balances.set(memberId, (balances.get(memberId) ?? 0) - shareCents);
     }
   }

@@ -2,7 +2,7 @@
 
 Micro-slices for gradual, test-driven development. Each slice has a summary in `docs/slices/`.
 
-**Current slice:** S6 — computeBalances
+**Current slice:** S7 — Rounding
 
 | Slice                                 | Status  | Summary                               |
 | ------------------------------------- | ------- | ------------------------------------- |
@@ -13,6 +13,7 @@ Micro-slices for gradual, test-driven development. Each slice has a summary in `
 | [S4](slices/S04-context-glossary.md)  | ✅ Done | CONTEXT.md domain glossary            |
 | [S5](slices/S05-ledger-types.md)      | ✅ Done | Ledger types for pure math            |
 | [S6](slices/S06-compute-balances.md)  | ✅ Done | computeBalances, one expense          |
+| [S7](slices/S07-rounding.md)          | ✅ Done | 100¢ ÷ 3 zero-sum rounding            |
 
 ## Verify
 
