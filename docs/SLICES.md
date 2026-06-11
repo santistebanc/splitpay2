@@ -2,7 +2,7 @@
 
 Micro-slices for gradual, test-driven development.
 
-**Next slice:** [S13 — AsyncStorage device ID](./ROADMAP.md#app-shell--s11s13) (see [`ROADMAP.md`](./ROADMAP.md) for full plan)
+**Next slice:** [S14 — PowerSync local DB](./ROADMAP.md#local-data--s14s16) (see [`ROADMAP.md`](./ROADMAP.md) for full plan)
 
 **How we work:** [`PROCESS.md`](./PROCESS.md)
 
@@ -23,11 +23,12 @@ Micro-slices for gradual, test-driven development.
 | [S10](slices/S10-is-payment.md)            | Payment expense detection               |
 | [S11](slices/S11-expo-web-shell.md)        | Expo web + Paper M3 shell               |
 | [S12](slices/S12-navigation-stubs.md)      | React Navigation stack + screen stubs   |
+| [S13](slices/S13-async-storage.md)         | AsyncStorage device ID + known groups   |
 | [Prep](slices/prep-roadmap-and-process.md) | Roadmap, process, ADRs                  |
 
 ## Upcoming
 
-See [`ROADMAP.md`](./ROADMAP.md) — **S13** (AsyncStorage) through **S28** (Join UI).
+See [`ROADMAP.md`](./ROADMAP.md) — **S14** (PowerSync) through **S28** (Join UI).
 
 ## Verify
 

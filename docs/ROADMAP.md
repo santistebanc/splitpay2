@@ -35,21 +35,21 @@ See [`SLICES.md`](./SLICES.md) for links to completed slice summaries.
 
 ## App shell ⏳ (S11–S13)
 
-| Slice   | Status      | Summary                                     | Exit criteria                                |
-| ------- | ----------- | ------------------------------------------- | -------------------------------------------- |
-| S11     | ✅          | Expo web + Paper M3 + system light/dark     | `npm run web` renders themed shell           |
-| S12     | ✅          | React Navigation stack + empty screen stubs | Navigate between route stubs                 |
-| **S13** | 🔜 **Next** | AsyncStorage: device ID + known groups list | Reload preserves device ID; Vitest mock test |
+| Slice | Status | Summary                                     | Exit criteria                                |
+| ----- | ------ | ------------------------------------------- | -------------------------------------------- |
+| S11   | ✅     | Expo web + Paper M3 + system light/dark     | `npm run web` renders themed shell           |
+| S12   | ✅     | React Navigation stack + empty screen stubs | Navigate between route stubs                 |
+| S13   | ✅     | AsyncStorage: device ID + known groups list | Reload preserves device ID; Vitest mock test |
 
 ---
 
 ## Local data ⏳ (S14–S16)
 
-| Slice | Status | Summary                               | Exit criteria                           |
-| ----- | ------ | ------------------------------------- | --------------------------------------- |
-| S14   | ⏳     | PowerSync local DB + schema migration | Vitest: tables exist, empty             |
-| S15   | ⏳     | `createGroup` repository              | Vitest: insert + read back              |
-| S16   | ⏳     | `addExpense` repository               | Vitest: expense + allocations persisted |
+| Slice   | Status      | Summary                               | Exit criteria                           |
+| ------- | ----------- | ------------------------------------- | --------------------------------------- |
+| **S14** | 🔜 **Next** | PowerSync local DB + schema migration | Vitest: tables exist, empty             |
+| S15     | ⏳          | `createGroup` repository              | Vitest: insert + read back              |
+| S16     | ⏳          | `addExpense` repository               | Vitest: expense + allocations persisted |
 
 ---
 
