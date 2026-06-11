@@ -2,7 +2,7 @@
 
 Micro-slices for gradual, test-driven development. Each slice has a summary in `docs/slices/`.
 
-**Current slice:** S5 — Ledger types
+**Current slice:** S6 — computeBalances
 
 | Slice                                 | Status  | Summary                               |
 | ------------------------------------- | ------- | ------------------------------------- |
@@ -12,6 +12,7 @@ Micro-slices for gradual, test-driven development. Each slice has a summary in `
 | [S3](slices/S03-github-actions-ci.md) | ✅ Done | GitHub Actions CI                     |
 | [S4](slices/S04-context-glossary.md)  | ✅ Done | CONTEXT.md domain glossary            |
 | [S5](slices/S05-ledger-types.md)      | ✅ Done | Ledger types for pure math            |
+| [S6](slices/S06-compute-balances.md)  | ✅ Done | computeBalances, one expense          |
 
 ## Verify
 
