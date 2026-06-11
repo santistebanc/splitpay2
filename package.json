@@ -6,12 +6,18 @@
     "packages/*"
   ],
   "scripts": {
-    "verify": "npm run typecheck",
+    "verify": "npm run typecheck && npm run format:check",
     "ci": "npm run verify",
     "typecheck": "npm run typecheck --workspaces --if-present",
-    "test": "echo \"Vitest arrives in S2\" && exit 0"
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "echo \"Vitest arrives in S2\" && exit 0",
+    "prepare": "husky"
   },
   "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.7",
+    "prettier": "^3.8.4",
     "typescript": "^5.8.3"
   }
 }
