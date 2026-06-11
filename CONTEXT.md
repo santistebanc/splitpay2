@@ -25,15 +25,27 @@ The act of binding an authenticated identity to a member slot, at group creation
 _Avoid_: Login, register, assign user
 
 **Expense**:
-A recorded cost: an amount in integer cents, who paid, and which members share it.
+A recorded cost: an amount in integer cents, who contributed money, and which members it is allocated to.
 _Avoid_: Transaction, charge, bill (as the stored record)
 
+**Contribution**:
+Money a member paid toward an expense. Today one member contributes the full amount; later several contributions may sum to the total.
+_Avoid_: Payer (as the only term), paid-by, payment (conflicts with settle-up **Payment**)
+
+**Allocation**:
+A member's share of an expense cost — who the expense is for. Equal portions for now.
+_Avoid_: Split (in code), share, paid-for
+
+**Allocation snapshot**:
+Allocations are fixed when an expense is saved. Members who join later are not added to old expenses.
+_Avoid_: Recomputing allocations from the current group roster
+
 **Split**:
-The link between an expense and a member who owes an equal share of that expense.
-_Avoid_: Share line, allocation, portion
+Everyday or UI word for how an expense is divided. In code, paid-for rows are **Allocations** and paid-by rows are **Contributions**.
+_Avoid_: Using "split" alone in types or APIs
 
 **Payment**:
-A special expense where one member pays and the cost is split across exactly one other member. Used to record settling up.
+A special expense where one member pays and the cost is allocated to exactly one other member. Used to record settling up.
 _Avoid_: Transfer, payout, settlement (as the stored record)
 
 **Balance**:

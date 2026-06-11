@@ -2,7 +2,7 @@
 
 Micro-slices for gradual, test-driven development. Each slice has a summary in `docs/slices/`.
 
-**Current slice:** S4 — CONTEXT.md glossary
+**Current slice:** S5 — Ledger types
 
 | Slice                                 | Status  | Summary                               |
 | ------------------------------------- | ------- | ------------------------------------- |
@@ -11,6 +11,7 @@ Micro-slices for gradual, test-driven development. Each slice has a summary in `
 | [S2](slices/S02-vitest.md)            | ✅ Done | Vitest + test in verify               |
 | [S3](slices/S03-github-actions-ci.md) | ✅ Done | GitHub Actions CI                     |
 | [S4](slices/S04-context-glossary.md)  | ✅ Done | CONTEXT.md domain glossary            |
+| [S5](slices/S05-ledger-types.md)      | ✅ Done | Ledger types for pure math            |
 
 ## Verify
 
