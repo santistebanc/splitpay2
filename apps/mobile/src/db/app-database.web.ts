@@ -1,8 +1,7 @@
 import type { AbstractPowerSyncDatabase } from "@powersync/common";
 import { PowerSyncDatabase, WASQLiteOpenFactory } from "@powersync/web";
 
-import { isE2eSeedName, runE2eSeed } from "./e2e-seed";
-import { listGroups } from "./list-groups";
+import { clearE2eData, isE2eSeedName, runE2eSeed } from "./e2e-seed";
 import { AppSchema } from "./schema";
 
 const DB_FILENAME = "splitpay.db";
@@ -37,10 +36,8 @@ export async function initAppDatabase(): Promise<AbstractPowerSyncDatabase> {
 
       const seedName = getE2eSeedFromUrl();
       if (seedName && isE2eSeedName(seedName)) {
-        const groups = await listGroups(db);
-        if (groups.length === 0) {
-          await runE2eSeed(db, seedName);
-        }
+        await clearE2eData(db);
+        await runE2eSeed(db, seedName);
       }
 
       return db;

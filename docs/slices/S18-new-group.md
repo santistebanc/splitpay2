@@ -1,6 +1,6 @@
 # S18 — New Group create flow
 
-**Status:** Done (awaiting confirm)
+**Status:** Done
 
 ## What changed
 
