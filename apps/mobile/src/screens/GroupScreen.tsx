@@ -5,10 +5,11 @@ import { useCallback, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Button, Text } from "react-native-paper";
 
+import type { ExpenseRecord } from "../db/add-expense";
 import { getGroup } from "../db/create-group";
 import { useDatabase } from "../db/DatabaseProvider";
 import { listGroupExpenses } from "../db/list-group-expenses";
-import { formatBalanceCents } from "../lib/format-balance";
+import { formatAmountCents, formatBalanceCents } from "../lib/format-balance";
 import type { RootStackParamList } from "../navigation/routes";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Group">;
@@ -25,6 +26,7 @@ export function GroupScreen({ navigation, route }: Props) {
   const [groupName, setGroupName] = useState("");
   const [currency, setCurrency] = useState("EUR");
   const [balances, setBalances] = useState<BalanceRow[]>([]);
+  const [expenses, setExpenses] = useState<ExpenseRecord[]>([]);
 
   useFocusEffect(
     useCallback(() => {
@@ -59,6 +61,7 @@ export function GroupScreen({ navigation, route }: Props) {
         if (!cancelled) {
           setGroupName(group.name);
           setCurrency(group.currency);
+          setExpenses(expenses);
           setBalances(
             ledgerBalances.map((balance) => ({
               memberId: balance.memberId,
@@ -93,6 +96,25 @@ export function GroupScreen({ navigation, route }: Props) {
               <Text variant="bodyLarge">{balance.displayName}</Text>
               <Text variant="bodyLarge">
                 {formatBalanceCents(balance.balanceCents, currency)}
+              </Text>
+            </View>
+          ))
+        )}
+      </View>
+      <View testID="expenses-list" style={styles.expenses}>
+        <Text variant="titleMedium">Expenses</Text>
+        {expenses.length === 0 ? (
+          <Text variant="bodyMedium">No expenses yet</Text>
+        ) : (
+          expenses.map((expense) => (
+            <View
+              key={expense.id}
+              testID={`expense-row-${expense.id}`}
+              style={styles.expenseRow}
+            >
+              <Text variant="bodyLarge">{expense.note || "Expense"}</Text>
+              <Text variant="bodyLarge">
+                {formatAmountCents(expense.amountCents, currency)}
               </Text>
             </View>
           ))
@@ -139,6 +161,13 @@ const styles = StyleSheet.create({
   },
   balances: {
     gap: 8,
+  },
+  expenses: {
+    gap: 8,
+  },
+  expenseRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   balanceRow: {
     flexDirection: "row",

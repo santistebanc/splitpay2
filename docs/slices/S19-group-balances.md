@@ -1,6 +1,6 @@
 # S19 — Group View balances panel
 
-**Status:** Done (awaiting confirm)
+**Status:** Done
 
 ## What changed
 

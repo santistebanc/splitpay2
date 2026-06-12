@@ -62,8 +62,8 @@ Per original plan: Groups → New Group → Group View → Add Expense only befo
 | **S17** | ✅          | Groups home — list from SQLite | Playwright: seeded group visible          |
 | **S18** | ✅          | New Group create flow          | Playwright: create → appears on home      |
 | **S19** | ✅          | Group View — balances panel    | Playwright: balances match ledger         |
-| **S20** | 🔜 **Next** | Group View — expenses list     | Playwright: expense row visible           |
-| S21     | ⏳          | Add Expense screen             | Playwright: add expense → balances update |
+| **S20** | ✅          | Group View — expenses list     | Playwright: expense row visible           |
+| **S21** | 🔜 **Next** | Add Expense screen             | Playwright: add expense → balances update |
 
 Playwright starts at S17. Manual checklist in each slice doc.
 

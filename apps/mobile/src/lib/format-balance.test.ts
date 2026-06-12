@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { formatBalanceCents } from "./format-balance.js";
+import { formatAmountCents, formatBalanceCents } from "./format-balance.js";
+
+describe("formatAmountCents", () => {
+  it("formats euro amounts without a sign", () => {
+    expect(formatAmountCents(1200, "EUR")).toBe("€12.00");
+  });
+});
 
 describe("formatBalanceCents", () => {
   it("formats positive and negative euro balances", () => {

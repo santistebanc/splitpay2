@@ -2,7 +2,7 @@
 
 Micro-slices for gradual, test-driven development.
 
-**Next slice:** [S20 — Group View expenses list](./ROADMAP.md#minimal-ui-loop--s17s21) (see [`ROADMAP.md`](./ROADMAP.md) for full plan)
+**Next slice:** [S21 — Add Expense screen](./ROADMAP.md#minimal-ui-loop--s17s21) (see [`ROADMAP.md`](./ROADMAP.md) for full plan)
 
 **How we work:** [`PROCESS.md`](./PROCESS.md)
 
@@ -30,11 +30,12 @@ Micro-slices for gradual, test-driven development.
 | [S17](slices/S17-groups-home.md)           | Groups home list from SQLite               |
 | [S18](slices/S18-new-group.md)             | New Group create flow                      |
 | [S19](slices/S19-group-balances.md)        | Group View balances panel                  |
+| [S20](slices/S20-group-expenses.md)        | Group View expenses list                   |
 | [Prep](slices/prep-roadmap-and-process.md) | Roadmap, process, ADRs                     |
 
 ## Upcoming
 
-See [`ROADMAP.md`](./ROADMAP.md) — **S20** (expenses list) through **S28** (Join UI).
+See [`ROADMAP.md`](./ROADMAP.md) — **S21** (Add Expense) through **S28** (Join UI).
 
 ## Verify
 
