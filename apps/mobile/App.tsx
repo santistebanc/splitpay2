@@ -3,6 +3,7 @@ import { StatusBar } from "expo-status-bar";
 import { PaperProvider } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
+import { DatabaseProvider } from "./src/db/DatabaseProvider";
 import { AppNavigator } from "./src/navigation/AppNavigator";
 import { getThemes } from "./src/lib/theme";
 import { useAppColorScheme } from "./src/lib/use-app-color-scheme";
@@ -16,7 +17,9 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <PaperProvider theme={paper}>
-        <AppNavigator navigationTheme={navigation} />
+        <DatabaseProvider>
+          <AppNavigator navigationTheme={navigation} />
+        </DatabaseProvider>
         <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
       </PaperProvider>
     </SafeAreaProvider>

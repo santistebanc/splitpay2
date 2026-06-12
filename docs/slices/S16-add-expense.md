@@ -1,6 +1,6 @@
 # S16 — addExpense repository
 
-**Status:** Done (awaiting confirm)
+**Status:** Done
 
 ## What changed
 

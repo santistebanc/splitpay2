@@ -13,7 +13,8 @@
       "userInterfaceStyle": "automatic"
     },
     "web": {
-      "bundler": "metro"
+      "bundler": "metro",
+      "output": "single"
     },
     "plugins": ["expo-status-bar"]
   }

@@ -1,49 +1,68 @@
+import { useFocusEffect } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { useCallback, useState } from "react";
+import { FlatList, Pressable, StyleSheet, View } from "react-native";
 import { Button, Text } from "react-native-paper";
 
-import {
-  addKnownGroup,
-  getKnownGroups,
-  type KnownGroup,
-} from "../lib/known-groups";
+import type { GroupRecord } from "../db/create-group";
+import { useDatabase } from "../db/DatabaseProvider";
+import { listGroups } from "../db/list-groups";
 import type { RootStackParamList } from "../navigation/routes";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Groups">;
 
-const DEMO_GROUP_ID = "demo";
-
 export function GroupsScreen({ navigation }: Props) {
-  const [knownGroups, setKnownGroups] = useState<KnownGroup[]>([]);
+  const db = useDatabase();
+  const [groups, setGroups] = useState<GroupRecord[]>([]);
 
-  useEffect(() => {
-    void getKnownGroups().then(setKnownGroups);
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
 
-  async function openDemoGroup() {
-    const groups = await addKnownGroup(DEMO_GROUP_ID);
-    setKnownGroups(groups);
-    navigation.navigate("Group", { groupId: DEMO_GROUP_ID });
-  }
+      void listGroups(db).then((nextGroups) => {
+        if (!cancelled) {
+          setGroups(nextGroups);
+        }
+      });
+
+      return () => {
+        cancelled = true;
+      };
+    }, [db])
+  );
 
   return (
     <View style={styles.container}>
       <Text variant="headlineSmall">Groups</Text>
-      {knownGroups.length > 0 ? (
-        <Text variant="bodySmall" style={styles.meta}>
-          Known: {knownGroups.map((group) => group.groupId).join(", ")}
-        </Text>
-      ) : null}
+      <FlatList
+        testID="groups-list"
+        data={groups}
+        keyExtractor={(group) => group.id}
+        style={styles.list}
+        contentContainerStyle={styles.listContent}
+        ListEmptyComponent={
+          <Text variant="bodyMedium" style={styles.empty}>
+            No groups yet
+          </Text>
+        }
+        renderItem={({ item: group }) => (
+          <Pressable
+            testID={`group-row-${group.id}`}
+            onPress={() => navigation.navigate("Group", { groupId: group.id })}
+          >
+            <Text variant="titleMedium">{group.name}</Text>
+            <Text variant="bodySmall">
+              {group.currency} · {group.joinCode}
+            </Text>
+          </Pressable>
+        )}
+      />
       <View style={styles.links}>
         <Button
           mode="contained"
           onPress={() => navigation.navigate("NewGroup")}
         >
           New Group
-        </Button>
-        <Button mode="contained" onPress={() => void openDemoGroup()}>
-          Open Group
         </Button>
         <Button
           mode="contained"
@@ -59,15 +78,24 @@ export function GroupsScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 16,
     paddingHorizontal: 16,
+    paddingTop: 16,
+    gap: 16,
   },
-  meta: {
+  list: {
+    flex: 1,
+    alignSelf: "stretch",
+  },
+  listContent: {
+    gap: 12,
+    paddingBottom: 8,
+  },
+  empty: {
     textAlign: "center",
+    paddingVertical: 24,
   },
   links: {
     gap: 8,
+    paddingBottom: 16,
   },
 });
