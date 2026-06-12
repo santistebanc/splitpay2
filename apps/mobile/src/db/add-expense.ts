@@ -1,4 +1,7 @@
 import type { AbstractPowerSyncDatabase } from "@powersync/common";
+import { isPayment } from "@splitpay/ledger";
+
+import { formatExpenseActivitySummary } from "../lib/format-expense-activity";
 
 export type ExpenseContributionRecord = {
   memberId: string;
@@ -44,6 +47,11 @@ type AllocationRow = {
   member_id: string;
 };
 
+type MemberNameRow = {
+  id: string;
+  display_name: string;
+};
+
 function mapExpenseRow(
   row: ExpenseRow
 ): Omit<ExpenseRecord, "contributions" | "allocations"> {
@@ -64,6 +72,21 @@ export async function addExpense(
   const expenseId = crypto.randomUUID();
   const createdAt = new Date().toISOString();
   const note = input.note ?? "";
+
+  const expenseRecord: ExpenseRecord = {
+    id: expenseId,
+    groupId: input.groupId,
+    amountCents: input.amountCents,
+    createdAt,
+    note,
+    contributions: input.contributions.map((contribution) => ({
+      memberId: contribution.memberId,
+      amountCents: contribution.amountCents,
+    })),
+    allocations: input.allocations.map((allocation) => ({
+      memberId: allocation.memberId,
+    })),
+  };
 
   await db.writeTransaction(async (tx) => {
     await tx.execute(
@@ -92,22 +115,47 @@ export async function addExpense(
         [crypto.randomUUID(), expenseId, allocation.memberId]
       );
     }
+
+    const groupRow = await tx.getOptional<{ currency: string }>(
+      `SELECT currency FROM groups WHERE id = ?`,
+      [input.groupId]
+    );
+    const memberRows = await tx.getAll<MemberNameRow>(
+      `SELECT id, display_name FROM members WHERE group_id = ?`,
+      [input.groupId]
+    );
+    const memberNames = new Map(
+      memberRows.map((row) => [row.id, row.display_name])
+    );
+    const summary = formatExpenseActivitySummary(
+      expenseRecord,
+      memberNames,
+      groupRow?.currency ?? "EUR"
+    );
+    const activityType = isPayment({
+      id: expenseId,
+      amountCents: input.amountCents,
+      contributions: expenseRecord.contributions,
+      allocations: expenseRecord.allocations,
+    })
+      ? "payment_recorded"
+      : "expense_added";
+
+    await tx.execute(
+      `INSERT INTO activities (id, group_id, type, summary, expense_id, created_at)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [
+        crypto.randomUUID(),
+        input.groupId,
+        activityType,
+        summary,
+        expenseId,
+        createdAt,
+      ]
+    );
   });
 
-  return {
-    id: expenseId,
-    groupId: input.groupId,
-    amountCents: input.amountCents,
-    createdAt,
-    note,
-    contributions: input.contributions.map((contribution) => ({
-      memberId: contribution.memberId,
-      amountCents: contribution.amountCents,
-    })),
-    allocations: input.allocations.map((allocation) => ({
-      memberId: allocation.memberId,
-    })),
-  };
+  return expenseRecord;
 }
 
 /** Loads an expense with contributions and allocations, or null when missing. */

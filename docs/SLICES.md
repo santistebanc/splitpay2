@@ -2,7 +2,7 @@
 
 Micro-slices for gradual, test-driven development.
 
-**Next slice:** [S24 — Activity feed](./ROADMAP.md#remaining-offline-ui--s22s24) (see [`ROADMAP.md`](./ROADMAP.md) for full plan)
+**Next slice:** [S25 — Supabase migrations](./ROADMAP.md#sync--join--s25s28) (see [`ROADMAP.md`](./ROADMAP.md) for full plan)
 
 **How we work:** [`PROCESS.md`](./PROCESS.md)
 
@@ -34,11 +34,12 @@ Micro-slices for gradual, test-driven development.
 | [S21](slices/S21-add-expense.md)           | Add Expense screen                         |
 | [S22](slices/S22-settle-up.md)             | Settle screen                              |
 | [S23](slices/S23-group-settings.md)        | Group Settings screen                      |
+| [S24](slices/S24-activity-feed.md)         | Activity feed                              |
 | [Prep](slices/prep-roadmap-and-process.md) | Roadmap, process, ADRs                     |
 
 ## Upcoming
 
-See [`ROADMAP.md`](./ROADMAP.md) — **S24** (Activity feed) through **S28** (Join UI).
+See [`ROADMAP.md`](./ROADMAP.md) — **S25** (Supabase migrations) through **S28** (Join UI).
 
 ## Verify
 

@@ -7,7 +7,7 @@ describe("project roadmap docs", () => {
     const process = readFileSync("docs/PROCESS.md", "utf8");
     const slices = readFileSync("docs/SLICES.md", "utf8");
 
-    expect(roadmap).toContain("S24");
+    expect(roadmap).toContain("S25");
     expect(roadmap).toContain("🔜 **Next**");
     expect(roadmap).toContain("S28");
     expect(process).toContain("npm run verify");

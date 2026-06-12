@@ -12,8 +12,16 @@ test("shows balances that match the ledger for a seeded group", async ({
   await expect(page.getByTestId("balances-panel")).toBeVisible({
     timeout: 30_000,
   });
-  await expect(page.getByText("Bob")).toBeVisible();
-  await expect(page.getByText("-€6.00")).toBeVisible();
-  await expect(page.getByText("Alice")).toBeVisible();
-  await expect(page.getByText("+€6.00")).toBeVisible();
+  await expect(
+    page.getByTestId("balances-panel").getByText("Bob")
+  ).toBeVisible();
+  await expect(
+    page.getByTestId("balances-panel").getByText("-€6.00")
+  ).toBeVisible();
+  await expect(
+    page.getByTestId("balances-panel").getByText("Alice")
+  ).toBeVisible();
+  await expect(
+    page.getByTestId("balances-panel").getByText("+€6.00")
+  ).toBeVisible();
 });

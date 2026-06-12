@@ -9,6 +9,7 @@ describe("APP_TABLE_NAMES", () => {
       "expenses",
       "expense_contributions",
       "expense_allocations",
+      "activities",
     ]);
   });
 });

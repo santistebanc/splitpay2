@@ -50,10 +50,22 @@ const expense_allocations = new Table(
   { indexes: { expense: ["expense_id"] }, localOnly: true }
 );
 
+const activities = new Table(
+  {
+    group_id: column.text,
+    type: column.text,
+    summary: column.text,
+    expense_id: column.text,
+    created_at: column.text,
+  },
+  { indexes: { group: ["group_id"] }, localOnly: true }
+);
+
 export const AppSchema = new Schema({
   groups,
   members,
   expenses,
   expense_contributions,
   expense_allocations,
+  activities,
 });

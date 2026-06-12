@@ -1,5 +1,5 @@
 /** Bumped when client-side table layout changes (PowerSync applies on open). */
-export const APP_SCHEMA_VERSION = 2;
+export const APP_SCHEMA_VERSION = 3;
 
 export const APP_TABLE_NAMES = [
   "groups",
@@ -7,6 +7,7 @@ export const APP_TABLE_NAMES = [
   "expenses",
   "expense_contributions",
   "expense_allocations",
+  "activities",
 ] as const;
 
 export type AppTableName = (typeof APP_TABLE_NAMES)[number];

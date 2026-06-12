@@ -8,6 +8,8 @@ import { Button, Text } from "react-native-paper";
 import type { ExpenseRecord } from "../db/add-expense";
 import { getGroup } from "../db/create-group";
 import { useDatabase } from "../db/DatabaseProvider";
+import type { ActivityRecord } from "../db/list-group-activities";
+import { listGroupActivities } from "../db/list-group-activities";
 import { listGroupExpenses } from "../db/list-group-expenses";
 import { formatAmountCents, formatBalanceCents } from "../lib/format-balance";
 import type { RootStackParamList } from "../navigation/routes";
@@ -27,6 +29,7 @@ export function GroupScreen({ navigation, route }: Props) {
   const [currency, setCurrency] = useState("EUR");
   const [balances, setBalances] = useState<BalanceRow[]>([]);
   const [expenses, setExpenses] = useState<ExpenseRecord[]>([]);
+  const [activities, setActivities] = useState<ActivityRecord[]>([]);
 
   useFocusEffect(
     useCallback(() => {
@@ -38,7 +41,10 @@ export function GroupScreen({ navigation, route }: Props) {
           return;
         }
 
-        const expenses = await listGroupExpenses(db, groupId);
+        const [expenses, groupActivities] = await Promise.all([
+          listGroupExpenses(db, groupId),
+          listGroupActivities(db, groupId),
+        ]);
         const ledgerBalances = computeBalances(
           group.members.map((member) => ({ id: member.id })),
           expenses.map((expense) => ({
@@ -62,6 +68,7 @@ export function GroupScreen({ navigation, route }: Props) {
           setGroupName(group.name);
           setCurrency(group.currency);
           setExpenses(expenses);
+          setActivities(groupActivities);
           setBalances(
             ledgerBalances.map((balance) => ({
               memberId: balance.memberId,
@@ -120,6 +127,22 @@ export function GroupScreen({ navigation, route }: Props) {
           ))
         )}
       </View>
+      <View testID="activity-feed" style={styles.activity}>
+        <Text variant="titleMedium">Activity</Text>
+        {activities.length === 0 ? (
+          <Text variant="bodyMedium">No activity yet</Text>
+        ) : (
+          activities.map((activity) => (
+            <Text
+              key={activity.id}
+              variant="bodyLarge"
+              testID={`activity-row-${activity.id}`}
+            >
+              {activity.summary}
+            </Text>
+          ))
+        )}
+      </View>
       <View style={styles.links}>
         <Button
           mode="contained"
@@ -163,6 +186,9 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   expenses: {
+    gap: 8,
+  },
+  activity: {
     gap: 8,
   },
   expenseRow: {

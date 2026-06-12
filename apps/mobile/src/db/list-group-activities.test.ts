@@ -1,7 +1,7 @@
 import { PowerSyncDatabase } from "@powersync/node";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { addExpense, getExpense } from "./add-expense.js";
+import { addExpense } from "./add-expense.js";
 import { createGroup } from "./create-group.js";
 import { listGroupActivities } from "./list-group-activities.js";
 import { AppSchema } from "./schema.js";
@@ -15,7 +15,7 @@ async function openTestDatabase(): Promise<PowerSyncDatabase> {
   return db;
 }
 
-describe("addExpense", () => {
+describe("listGroupActivities", () => {
   let db: PowerSyncDatabase | undefined;
 
   afterEach(async () => {
@@ -25,50 +25,42 @@ describe("addExpense", () => {
     }
   });
 
-  it("persists an expense with contributions and allocation snapshot", async () => {
+  it("returns activity rows for expenses newest first", async () => {
     db = await openTestDatabase();
     const group = await createGroup(db, {
-      name: "Ski weekend",
+      name: "Beach trip",
       currency: "EUR",
       memberNames: ["Alice", "Bob"],
     });
     const [alice, bob] = group.members;
 
-    const created = await addExpense(db, {
+    await addExpense(db, {
+      groupId: group.id,
+      amountCents: 600,
+      note: "Coffee",
+      contributions: [{ memberId: alice.id, amountCents: 600 }],
+      allocations: [{ memberId: alice.id }, { memberId: bob.id }],
+    });
+    await addExpense(db, {
       groupId: group.id,
       amountCents: 1200,
-      note: "Dinner",
+      note: "Lunch",
       contributions: [{ memberId: alice.id, amountCents: 1200 }],
       allocations: [{ memberId: alice.id }, { memberId: bob.id }],
     });
-
-    expect(created).toEqual({
-      id: expect.any(String),
-      groupId: group.id,
-      amountCents: 1200,
-      note: "Dinner",
-      createdAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T/),
-      contributions: [{ memberId: alice.id, amountCents: 1200 }],
-      allocations: [{ memberId: alice.id }, { memberId: bob.id }],
-    });
-
-    const loaded = await getExpense(db, created.id);
-
-    expect(loaded).toEqual(created);
 
     const activities = await listGroupActivities(db, group.id);
+
     expect(activities).toEqual([
       expect.objectContaining({
         type: "expense_added",
-        summary: "Alice paid €12.00 for Dinner",
-        expenseId: created.id,
+        summary: "Alice paid €12.00 for Lunch",
+        expenseId: expect.any(String),
+      }),
+      expect.objectContaining({
+        type: "expense_added",
+        summary: "Alice paid €6.00 for Coffee",
       }),
     ]);
-  });
-
-  it("returns null when the expense id is unknown", async () => {
-    db = await openTestDatabase();
-
-    await expect(getExpense(db, "missing-expense")).resolves.toBeNull();
   });
 });

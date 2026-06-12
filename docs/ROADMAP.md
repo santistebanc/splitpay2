@@ -71,22 +71,22 @@ Playwright starts at S17. Manual checklist in each slice doc.
 
 ## Remaining offline UI ⏳ (S22–S24)
 
-| Slice   | Status      | Summary                          | Exit criteria                               |
-| ------- | ----------- | -------------------------------- | ------------------------------------------- |
-| **S22** | ✅          | Settle screen                    | Tap Settle → payment expense; balances move |
-| **S23** | ✅          | Settings — rename, members, exit | Rename group; exit removes group locally    |
-| **S24** | 🔜 **Next** | Activity feed                    | Actions appear in feed                      |
+| Slice   | Status | Summary                          | Exit criteria                               |
+| ------- | ------ | -------------------------------- | ------------------------------------------- |
+| **S22** | ✅     | Settle screen                    | Tap Settle → payment expense; balances move |
+| **S23** | ✅     | Settings — rename, members, exit | Rename group; exit removes group locally    |
+| **S24** | ✅     | Activity feed                    | Actions appear in feed                      |
 
 ---
 
 ## Sync & join ⏳ (S25–S28+)
 
-| Slice | Status | Summary                       | Exit criteria                    |
-| ----- | ------ | ----------------------------- | -------------------------------- |
-| S25   | ⏳     | `supabase/` migrations        | `supabase db reset` locally      |
-| S26   | ⏳     | Edge function: join           | curl test against local Supabase |
-| S27   | ⏳     | PowerSync connect (env-gated) | Two clients sync one expense     |
-| S28   | ⏳     | Join Group UI                 | Second client joins via code     |
+| Slice   | Status      | Summary                       | Exit criteria                    |
+| ------- | ----------- | ----------------------------- | -------------------------------- |
+| **S25** | 🔜 **Next** | `supabase/` migrations        | `supabase db reset` locally      |
+| S26     | ⏳          | Edge function: join           | curl test against local Supabase |
+| S27     | ⏳          | PowerSync connect (env-gated) | Two clients sync one expense     |
+| S28     | ⏳          | Join Group UI                 | Second client joins via code     |
 
 Integration CI: optional job when `SUPABASE_*` secrets configured.
 

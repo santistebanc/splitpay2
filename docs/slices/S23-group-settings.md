@@ -1,6 +1,6 @@
 # S23 — Group Settings screen
 
-**Status:** Done (awaiting confirm)
+**Status:** Done
 
 ## What changed
 

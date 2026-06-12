@@ -10,6 +10,10 @@ test("shows expense rows on the group view", async ({ page }) => {
   await expect(page.getByTestId("expenses-list")).toBeVisible({
     timeout: 30_000,
   });
-  await expect(page.getByText("Dinner")).toBeVisible();
-  await expect(page.getByText("€12.00")).toBeVisible();
+  await expect(
+    page.getByTestId("expenses-list").getByText("Dinner")
+  ).toBeVisible();
+  await expect(
+    page.getByTestId("expenses-list").getByText("€12.00")
+  ).toBeVisible();
 });
