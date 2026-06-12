@@ -57,13 +57,13 @@ See [`SLICES.md`](./SLICES.md) for links to completed slice summaries.
 
 Per original plan: Groups → New Group → Group View → Add Expense only before Settle/Settings.
 
-| Slice   | Status      | Summary                        | Exit criteria                             |
-| ------- | ----------- | ------------------------------ | ----------------------------------------- |
-| **S17** | ✅          | Groups home — list from SQLite | Playwright: seeded group visible          |
-| **S18** | ✅          | New Group create flow          | Playwright: create → appears on home      |
-| **S19** | ✅          | Group View — balances panel    | Playwright: balances match ledger         |
-| **S20** | ✅          | Group View — expenses list     | Playwright: expense row visible           |
-| **S21** | 🔜 **Next** | Add Expense screen             | Playwright: add expense → balances update |
+| Slice   | Status | Summary                        | Exit criteria                             |
+| ------- | ------ | ------------------------------ | ----------------------------------------- |
+| **S17** | ✅     | Groups home — list from SQLite | Playwright: seeded group visible          |
+| **S18** | ✅     | New Group create flow          | Playwright: create → appears on home      |
+| **S19** | ✅     | Group View — balances panel    | Playwright: balances match ledger         |
+| **S20** | ✅     | Group View — expenses list     | Playwright: expense row visible           |
+| **S21** | ✅     | Add Expense screen             | Playwright: add expense → balances update |
 
 Playwright starts at S17. Manual checklist in each slice doc.
 
@@ -71,11 +71,11 @@ Playwright starts at S17. Manual checklist in each slice doc.
 
 ## Remaining offline UI ⏳ (S22–S24)
 
-| Slice | Status | Summary                          | Exit criteria                               |
-| ----- | ------ | -------------------------------- | ------------------------------------------- |
-| S22   | ⏳     | Settle screen                    | Tap Settle → payment expense; balances move |
-| S23   | ⏳     | Settings — rename, members, exit | Rename group; exit removes group locally    |
-| S24   | ⏳     | Activity feed                    | Actions appear in feed                      |
+| Slice   | Status      | Summary                          | Exit criteria                               |
+| ------- | ----------- | -------------------------------- | ------------------------------------------- |
+| **S22** | 🔜 **Next** | Settle screen                    | Tap Settle → payment expense; balances move |
+| S23     | ⏳          | Settings — rename, members, exit | Rename group; exit removes group locally    |
+| S24     | ⏳          | Activity feed                    | Actions appear in feed                      |
 
 ---
 

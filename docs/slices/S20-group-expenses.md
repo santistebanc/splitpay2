@@ -1,6 +1,6 @@
 # S20 — Group View expenses list
 
-**Status:** Done (awaiting confirm)
+**Status:** Done
 
 ## What changed
 
