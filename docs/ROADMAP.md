@@ -74,8 +74,8 @@ Playwright starts at S17. Manual checklist in each slice doc.
 | Slice   | Status      | Summary                          | Exit criteria                               |
 | ------- | ----------- | -------------------------------- | ------------------------------------------- |
 | **S22** | ✅          | Settle screen                    | Tap Settle → payment expense; balances move |
-| **S23** | 🔜 **Next** | Settings — rename, members, exit | Rename group; exit removes group locally    |
-| S24     | ⏳          | Activity feed                    | Actions appear in feed                      |
+| **S23** | ✅          | Settings — rename, members, exit | Rename group; exit removes group locally    |
+| **S24** | 🔜 **Next** | Activity feed                    | Actions appear in feed                      |
 
 ---
 

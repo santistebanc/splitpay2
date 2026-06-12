@@ -1,6 +1,6 @@
 # S22 — Settle screen
 
-**Status:** Done (awaiting confirm)
+**Status:** Done
 
 ## What changed
 

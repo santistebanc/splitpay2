@@ -7,6 +7,7 @@ import { Button, Text } from "react-native-paper";
 import type { GroupRecord } from "../db/create-group";
 import { useDatabase } from "../db/DatabaseProvider";
 import { listGroups } from "../db/list-groups";
+import { getKnownGroups } from "../lib/known-groups";
 import type { RootStackParamList } from "../navigation/routes";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Groups">;
@@ -19,11 +20,18 @@ export function GroupsScreen({ navigation }: Props) {
     useCallback(() => {
       let cancelled = false;
 
-      void listGroups(db).then((nextGroups) => {
+      void (async () => {
+        const [allGroups, knownGroups] = await Promise.all([
+          listGroups(db),
+          getKnownGroups(),
+        ]);
+        const knownIds = new Set(knownGroups.map((group) => group.groupId));
+        const nextGroups = allGroups.filter((group) => knownIds.has(group.id));
+
         if (!cancelled) {
           setGroups(nextGroups);
         }
-      });
+      })();
 
       return () => {
         cancelled = true;

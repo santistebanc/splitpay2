@@ -19,5 +19,12 @@ export type { E2eSeedName } from "./e2e-seed";
 export { generateJoinCode, isValidJoinCode } from "./join-code";
 export { listGroupExpenses } from "./list-group-expenses";
 export { listGroups } from "./list-groups";
+export {
+  addMember,
+  isMemberReferenced,
+  removeMember,
+  renameGroup,
+  renameMember,
+} from "./update-group";
 export { initLocalDatabase, openLocalDatabase } from "./open-database";
 export { APP_SCHEMA_VERSION, APP_TABLE_NAMES, AppSchema } from "./schema";

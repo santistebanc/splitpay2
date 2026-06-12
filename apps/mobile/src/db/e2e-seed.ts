@@ -1,5 +1,6 @@
 import type { AbstractPowerSyncDatabase } from "@powersync/common";
 
+import { addKnownGroup } from "../lib/known-groups";
 import { addExpense } from "./add-expense";
 import { createGroup } from "./create-group";
 import { APP_TABLE_NAMES } from "./table-names";
@@ -37,6 +38,7 @@ async function seedGroupBalances(db: AbstractPowerSyncDatabase): Promise<void> {
     contributions: [{ memberId: alice.id, amountCents: 1200 }],
     allocations: [{ memberId: alice.id }, { memberId: bob.id }],
   });
+  await addKnownGroup(group.id);
 }
 
 /** Wipes app tables so `?e2eSeed=` always starts from a known state. */
@@ -63,5 +65,6 @@ export async function runE2eSeed(
   }
 
   const seed = E2E_SEEDS[seedName];
-  await createGroup(db, seed);
+  const group = await createGroup(db, seed);
+  await addKnownGroup(group.id);
 }
