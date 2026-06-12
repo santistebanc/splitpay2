@@ -47,8 +47,8 @@ See [`SLICES.md`](./SLICES.md) for links to completed slice summaries.
 
 | Slice   | Status      | Summary                               | Exit criteria                           |
 | ------- | ----------- | ------------------------------------- | --------------------------------------- |
-| **S14** | 🔜 **Next** | PowerSync local DB + schema migration | Vitest: tables exist, empty             |
-| S15     | ⏳          | `createGroup` repository              | Vitest: insert + read back              |
+| **S14** | ✅          | PowerSync local DB + schema migration | Vitest: tables exist, empty             |
+| **S15** | 🔜 **Next** | `createGroup` repository              | Vitest: insert + read back              |
 | S16     | ⏳          | `addExpense` repository               | Vitest: expense + allocations persisted |
 
 ---
