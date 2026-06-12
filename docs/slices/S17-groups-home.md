@@ -1,6 +1,6 @@
 # S17 — Groups home list from SQLite
 
-**Status:** Done (awaiting confirm)
+**Status:** Done
 
 ## What changed
 
