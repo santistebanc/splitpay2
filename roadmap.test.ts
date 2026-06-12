@@ -2,12 +2,12 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 describe("project roadmap docs", () => {
-  it("lists S16 as next and documents the full process", () => {
+  it("lists S17 as next and documents the full process", () => {
     const roadmap = readFileSync("docs/ROADMAP.md", "utf8");
     const process = readFileSync("docs/PROCESS.md", "utf8");
     const slices = readFileSync("docs/SLICES.md", "utf8");
 
-    expect(roadmap).toContain("S16");
+    expect(roadmap).toContain("S17");
     expect(roadmap).toContain("🔜 **Next**");
     expect(roadmap).toContain("S28");
     expect(process).toContain("npm run verify");

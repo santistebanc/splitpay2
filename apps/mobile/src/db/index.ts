@@ -1,3 +1,10 @@
+export { addExpense, getExpense } from "./add-expense";
+export type {
+  AddExpenseInput,
+  ExpenseAllocationRecord,
+  ExpenseContributionRecord,
+  ExpenseRecord,
+} from "./add-expense";
 export { createGroup, getGroup } from "./create-group";
 export type {
   CreateGroupInput,

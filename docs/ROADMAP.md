@@ -45,11 +45,11 @@ See [`SLICES.md`](./SLICES.md) for links to completed slice summaries.
 
 ## Local data ⏳ (S14–S16)
 
-| Slice   | Status      | Summary                               | Exit criteria                           |
-| ------- | ----------- | ------------------------------------- | --------------------------------------- |
-| **S14** | ✅          | PowerSync local DB + schema migration | Vitest: tables exist, empty             |
-| **S15** | ✅          | `createGroup` repository              | Vitest: insert + read back              |
-| **S16** | 🔜 **Next** | `addExpense` repository               | Vitest: expense + allocations persisted |
+| Slice   | Status | Summary                               | Exit criteria                           |
+| ------- | ------ | ------------------------------------- | --------------------------------------- |
+| **S14** | ✅     | PowerSync local DB + schema migration | Vitest: tables exist, empty             |
+| **S15** | ✅     | `createGroup` repository              | Vitest: insert + read back              |
+| **S16** | ✅     | `addExpense` repository               | Vitest: expense + allocations persisted |
 
 ---
 
@@ -57,13 +57,13 @@ See [`SLICES.md`](./SLICES.md) for links to completed slice summaries.
 
 Per original plan: Groups → New Group → Group View → Add Expense only before Settle/Settings.
 
-| Slice | Status | Summary                        | Exit criteria                             |
-| ----- | ------ | ------------------------------ | ----------------------------------------- |
-| S17   | ⏳     | Groups home — list from SQLite | Playwright: seeded group visible          |
-| S18   | ⏳     | New Group create flow          | Playwright: create → appears on home      |
-| S19   | ⏳     | Group View — balances panel    | Playwright: balances match ledger         |
-| S20   | ⏳     | Group View — expenses list     | Playwright: expense row visible           |
-| S21   | ⏳     | Add Expense screen             | Playwright: add expense → balances update |
+| Slice   | Status      | Summary                        | Exit criteria                             |
+| ------- | ----------- | ------------------------------ | ----------------------------------------- |
+| **S17** | 🔜 **Next** | Groups home — list from SQLite | Playwright: seeded group visible          |
+| S18     | ⏳          | New Group create flow          | Playwright: create → appears on home      |
+| S19     | ⏳          | Group View — balances panel    | Playwright: balances match ledger         |
+| S20     | ⏳          | Group View — expenses list     | Playwright: expense row visible           |
+| S21     | ⏳          | Add Expense screen             | Playwright: add expense → balances update |
 
 Playwright starts at S17. Manual checklist in each slice doc.
 
