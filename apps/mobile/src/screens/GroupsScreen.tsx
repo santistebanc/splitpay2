@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Button, Text } from "react-native-paper";
 
-import { getOrCreateDeviceId } from "../lib/device-id";
 import {
   addKnownGroup,
   getKnownGroups,
@@ -16,14 +15,10 @@ type Props = NativeStackScreenProps<RootStackParamList, "Groups">;
 const DEMO_GROUP_ID = "demo";
 
 export function GroupsScreen({ navigation }: Props) {
-  const [deviceId, setDeviceId] = useState<string | null>(null);
   const [knownGroups, setKnownGroups] = useState<KnownGroup[]>([]);
 
   useEffect(() => {
-    void (async () => {
-      setDeviceId(await getOrCreateDeviceId());
-      setKnownGroups(await getKnownGroups());
-    })();
+    void getKnownGroups().then(setKnownGroups);
   }, []);
 
   async function openDemoGroup() {
@@ -35,11 +30,6 @@ export function GroupsScreen({ navigation }: Props) {
   return (
     <View style={styles.container}>
       <Text variant="headlineSmall">Groups</Text>
-      {deviceId ? (
-        <Text variant="bodySmall" style={styles.meta}>
-          Device: {deviceId}
-        </Text>
-      ) : null}
       {knownGroups.length > 0 ? (
         <Text variant="bodySmall" style={styles.meta}>
           Known: {knownGroups.map((group) => group.groupId).join(", ")}

@@ -8,23 +8,23 @@ Micro-slices for gradual, test-driven development.
 
 ## Completed
 
-| Slice                                      | Summary                                 |
-| ------------------------------------------ | --------------------------------------- |
-| [S0](slices/S00-monorepo-skeleton.md)      | npm workspaces, ledger + mobile stubs   |
-| [S1](slices/S01-tooling.md)                | Prettier, Husky, lint-staged            |
-| [S2](slices/S02-vitest.md)                 | Vitest + test in verify                 |
-| [S3](slices/S03-github-actions-ci.md)      | GitHub Actions CI                       |
-| [S4](slices/S04-context-glossary.md)       | CONTEXT.md domain glossary              |
-| [S5](slices/S05-ledger-types.md)           | Ledger types (Contribution, Allocation) |
-| [S6](slices/S06-compute-balances.md)       | computeBalances, one expense            |
-| [S7](slices/S07-rounding.md)               | 100¢ ÷ 3 zero-sum rounding              |
-| [S8](slices/S08-empty-allocations.md)      | Empty allocations → snapshot members    |
-| [S9](slices/S09-compute-settlements.md)    | Greedy settlement matching              |
-| [S10](slices/S10-is-payment.md)            | Payment expense detection               |
-| [S11](slices/S11-expo-web-shell.md)        | Expo web + Paper M3 shell               |
-| [S12](slices/S12-navigation-stubs.md)      | React Navigation stack + screen stubs   |
-| [S13](slices/S13-async-storage.md)         | AsyncStorage device ID + known groups   |
-| [Prep](slices/prep-roadmap-and-process.md) | Roadmap, process, ADRs                  |
+| Slice                                      | Summary                                    |
+| ------------------------------------------ | ------------------------------------------ |
+| [S0](slices/S00-monorepo-skeleton.md)      | npm workspaces, ledger + mobile stubs      |
+| [S1](slices/S01-tooling.md)                | Prettier, Husky, lint-staged               |
+| [S2](slices/S02-vitest.md)                 | Vitest + test in verify                    |
+| [S3](slices/S03-github-actions-ci.md)      | GitHub Actions CI                          |
+| [S4](slices/S04-context-glossary.md)       | CONTEXT.md domain glossary                 |
+| [S5](slices/S05-ledger-types.md)           | Ledger types (Contribution, Allocation)    |
+| [S6](slices/S06-compute-balances.md)       | computeBalances, one expense               |
+| [S7](slices/S07-rounding.md)               | 100¢ ÷ 3 zero-sum rounding                 |
+| [S8](slices/S08-empty-allocations.md)      | Empty allocations → snapshot members       |
+| [S9](slices/S09-compute-settlements.md)    | Greedy settlement matching                 |
+| [S10](slices/S10-is-payment.md)            | Payment expense detection                  |
+| [S11](slices/S11-expo-web-shell.md)        | Expo web + Paper M3 shell                  |
+| [S12](slices/S12-navigation-stubs.md)      | React Navigation stack + screen stubs      |
+| [S13](slices/S13-async-storage.md)         | AsyncStorage known groups + assumed member |
+| [Prep](slices/prep-roadmap-and-process.md) | Roadmap, process, ADRs                     |
 
 ## Upcoming
 

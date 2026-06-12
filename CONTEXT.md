@@ -9,20 +9,16 @@ A shared space with a name, join code, currency, members, and expenses.
 _Avoid_: Workspace, room, trip (as the primary term)
 
 **Member**:
-A named slot in a group. Money math always references member IDs; display names are cosmetic.
+A named slot in a group. Money math always references member IDs; display names are cosmetic. Anyone in the group may add, rename, or remove members (remove only when the member is not referenced by expenses).
 _Avoid_: User, participant, person
 
-**Claimed member**:
-A member slot bound to an authenticated identity on a device. That person is this member in the group.
-_Avoid_: Owner, registered user
+**Assumed member**:
+The member this device treats as “me” in a group — for styling, list labels, and form defaults. Device-local, not synced. Multiple devices may assume the same member, or none.
+_Avoid_: Identity, owner, my member
 
-**Unclaimed member**:
-A member slot with only a display name. Anyone in the group can record expenses against it; a future joiner may claim it.
-_Avoid_: Placeholder user, guest
-
-**Claim**:
-The act of binding an authenticated identity to a member slot, at group creation or when joining.
-_Avoid_: Login, register, assign user
+**Assume**:
+The act of choosing which member this device highlights as “me” in a group, at create, join, or in Settings. Clearing the choice (None) is valid.
+_Avoid_: Claim, login, register
 
 **Expense**:
 A recorded cost: an amount in integer cents, who contributed money, and which members it is allocated to.

@@ -5,3 +5,6 @@ dist/
 .DS_Store
 .env
 .env.*
+splitpay-test-*.db
+splitpay-test-*.db-shm
+splitpay-test-*.db-wal

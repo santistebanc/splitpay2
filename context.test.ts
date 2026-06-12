@@ -4,9 +4,8 @@ import { describe, expect, it } from "vitest";
 const DOMAIN_TERMS = [
   "Group",
   "Member",
-  "Claimed member",
-  "Unclaimed member",
-  "Claim",
+  "Assumed member",
+  "Assume",
   "Expense",
   "Contribution",
   "Allocation",

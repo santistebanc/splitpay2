@@ -1,6 +1,8 @@
-# S13 — AsyncStorage device ID + known groups
+# S13 — AsyncStorage known groups
 
 **Status:** Done
+
+> **Note:** Device ID was removed per [ADR 0003](../adr/0003-assumed-member.md). Known groups now supports optional `assumedMemberId` per group.
 
 ## What changed
 

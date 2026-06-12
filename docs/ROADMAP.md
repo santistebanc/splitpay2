@@ -35,11 +35,11 @@ See [`SLICES.md`](./SLICES.md) for links to completed slice summaries.
 
 ## App shell ⏳ (S11–S13)
 
-| Slice | Status | Summary                                     | Exit criteria                                |
-| ----- | ------ | ------------------------------------------- | -------------------------------------------- |
-| S11   | ✅     | Expo web + Paper M3 + system light/dark     | `npm run web` renders themed shell           |
-| S12   | ✅     | React Navigation stack + empty screen stubs | Navigate between route stubs                 |
-| S13   | ✅     | AsyncStorage: device ID + known groups list | Reload preserves device ID; Vitest mock test |
+| Slice | Status | Summary                                     | Exit criteria                          |
+| ----- | ------ | ------------------------------------------- | -------------------------------------- |
+| S11   | ✅     | Expo web + Paper M3 + system light/dark     | `npm run web` renders themed shell     |
+| S12   | ✅     | React Navigation stack + empty screen stubs | Navigate between route stubs           |
+| S13   | ✅     | AsyncStorage: known groups + assumed member | Vitest mock test; per-group assumption |
 
 ---
 
@@ -74,7 +74,7 @@ Playwright starts at S17. Manual checklist in each slice doc.
 | Slice | Status | Summary                          | Exit criteria                               |
 | ----- | ------ | -------------------------------- | ------------------------------------------- |
 | S22   | ⏳     | Settle screen                    | Tap Settle → payment expense; balances move |
-| S23   | ⏳     | Settings — rename, members, exit | Rename group; exit frees slot               |
+| S23   | ⏳     | Settings — rename, members, exit | Rename group; exit removes group locally    |
 | S24   | ⏳     | Activity feed                    | Actions appear in feed                      |
 
 ---
@@ -96,6 +96,7 @@ Integration CI: optional job when `SUPABASE_*` secrets configured.
 
 - Tracer-bullet phasing, web-first dev → [`adr/0001-micro-slices-and-phasing.md`](./adr/0001-micro-slices-and-phasing.md)
 - Contribution / Allocation naming, allocation snapshot → [`adr/0002-contribution-allocation-model.md`](./adr/0002-contribution-allocation-model.md)
+- Assumed member (device-local), no claim slots → [`adr/0003-assumed-member.md`](./adr/0003-assumed-member.md)
 
 ---
 
