@@ -1,6 +1,6 @@
 # S21 — Add Expense screen
 
-**Status:** Done (awaiting confirm)
+**Status:** Done
 
 ## What changed
 

@@ -2,7 +2,7 @@
 
 Micro-slices for gradual, test-driven development.
 
-**Next slice:** [S22 — Settle screen](./ROADMAP.md#remaining-offline-ui--s22s24) (see [`ROADMAP.md`](./ROADMAP.md) for full plan)
+**Next slice:** [S23 — Settings screen](./ROADMAP.md#remaining-offline-ui--s22s24) (see [`ROADMAP.md`](./ROADMAP.md) for full plan)
 
 **How we work:** [`PROCESS.md`](./PROCESS.md)
 
@@ -32,11 +32,12 @@ Micro-slices for gradual, test-driven development.
 | [S19](slices/S19-group-balances.md)        | Group View balances panel                  |
 | [S20](slices/S20-group-expenses.md)        | Group View expenses list                   |
 | [S21](slices/S21-add-expense.md)           | Add Expense screen                         |
+| [S22](slices/S22-settle-up.md)             | Settle screen                              |
 | [Prep](slices/prep-roadmap-and-process.md) | Roadmap, process, ADRs                     |
 
 ## Upcoming
 
-See [`ROADMAP.md`](./ROADMAP.md) — **S22** (Settle) through **S28** (Join UI).
+See [`ROADMAP.md`](./ROADMAP.md) — **S23** (Settings) through **S28** (Join UI).
 
 ## Verify
 
