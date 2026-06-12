@@ -2,7 +2,7 @@
 
 Micro-slices for gradual, test-driven development.
 
-**Next slice:** [S15 — createGroup repository](./ROADMAP.md#local-data--s14s16) (see [`ROADMAP.md`](./ROADMAP.md) for full plan)
+**Next slice:** [S16 — addExpense repository](./ROADMAP.md#local-data--s14s16) (see [`ROADMAP.md`](./ROADMAP.md) for full plan)
 
 **How we work:** [`PROCESS.md`](./PROCESS.md)
 
@@ -25,11 +25,12 @@ Micro-slices for gradual, test-driven development.
 | [S12](slices/S12-navigation-stubs.md)      | React Navigation stack + screen stubs      |
 | [S13](slices/S13-async-storage.md)         | AsyncStorage known groups + assumed member |
 | [S14](slices/S14-powersync-schema.md)      | PowerSync local DB + schema                |
+| [S15](slices/S15-create-group.md)          | createGroup repository                     |
 | [Prep](slices/prep-roadmap-and-process.md) | Roadmap, process, ADRs                     |
 
 ## Upcoming
 
-See [`ROADMAP.md`](./ROADMAP.md) — **S15** (createGroup) through **S28** (Join UI).
+See [`ROADMAP.md`](./ROADMAP.md) — **S16** (addExpense) through **S28** (Join UI).
 
 ## Verify
 
