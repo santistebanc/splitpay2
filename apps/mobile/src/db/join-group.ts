@@ -1,13 +1,15 @@
 import type { AbstractPowerSyncDatabase } from "@powersync/common";
-import { createClient } from "@supabase/supabase-js";
 
-import type {
-  GroupRecord,
-  GroupWithMembers,
-  MemberRecord,
-} from "./create-group";
+import { getGroup } from "./create-group";
+import type { GroupWithMembers, MemberRecord } from "./create-group";
+import { connectSyncIfConfigured } from "./connect-sync";
 import { isValidJoinCode } from "./join-code";
-import { getSupabaseConfig } from "./sync-config";
+import { getSupabaseClient } from "./supabase-client";
+import {
+  getSupabaseConfig,
+  getSyncConfig,
+  type SupabaseConfig,
+} from "./sync-config";
 
 export type JoinGroupResult = GroupWithMembers & {
   member: MemberRecord;
@@ -18,11 +20,39 @@ export type JoinGroupInput = {
   displayName: string;
 };
 
-async function ensureSession(
+type RawMember = {
+  id: string;
+  groupId?: string;
+  group_id?: string;
+  displayName?: string;
+  display_name?: string;
+};
+
+/** Normalizes join API / PostgREST member shapes into client records. */
+export function normalizeMember(raw: RawMember, groupId: string): MemberRecord {
+  return {
+    id: raw.id,
+    groupId: raw.groupId ?? raw.group_id ?? groupId,
+    displayName: raw.displayName ?? raw.display_name ?? "",
+  };
+}
+
+function normalizeJoinedResult(joined: JoinGroupResult): JoinGroupResult {
+  const members = joined.members.map((member) =>
+    normalizeMember(member, joined.id)
+  );
+  return {
+    ...joined,
+    members,
+    member: normalizeMember(joined.member, joined.id),
+  };
+}
+
+async function ensureAccessToken(
   supabaseUrl: string,
   supabaseAnonKey: string
 ): Promise<string> {
-  const client = createClient(supabaseUrl, supabaseAnonKey);
+  const client = getSupabaseClient({ supabaseUrl, supabaseAnonKey });
   const { data: sessionData } = await client.auth.getSession();
   if (!sessionData.session) {
     const { error } = await client.auth.signInAnonymously();
@@ -69,9 +99,9 @@ export async function fetchJoinGroup(
 
   const body = (await response.json().catch(() => ({}))) as {
     error?: string;
-    group?: GroupRecord;
-    member?: MemberRecord;
-    members?: MemberRecord[];
+    group?: JoinGroupResult;
+    member?: RawMember;
+    members?: RawMember[];
   };
 
   if (!response.ok) {
@@ -82,11 +112,137 @@ export async function fetchJoinGroup(
     throw new Error("Join response was incomplete");
   }
 
-  return {
+  return normalizeJoinedResult({
     ...body.group,
-    member: body.member,
-    members: body.members,
+    member: body.member as MemberRecord,
+    members: body.members as MemberRecord[],
+  });
+}
+
+/** Loads the member roster for a group from Supabase (requires group membership). */
+export async function fetchGroupMembersFromServer(
+  config: SupabaseConfig,
+  groupId: string
+): Promise<MemberRecord[]> {
+  const client = getSupabaseClient(config);
+  const { data, error } = await client
+    .from("members")
+    .select("id, group_id, display_name")
+    .eq("group_id", groupId)
+    .order("display_name");
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data ?? []).map((row) =>
+    normalizeMember(
+      {
+        id: row.id,
+        group_id: row.group_id,
+        display_name: row.display_name,
+      },
+      groupId
+    )
+  );
+}
+
+async function importRosterOffline(
+  db: AbstractPowerSyncDatabase,
+  roster: JoinGroupResult
+): Promise<void> {
+  const wasConnected = db.connected;
+  if (wasConnected) {
+    await db.disconnect();
+  }
+
+  try {
+    await importJoinedGroup(db, roster);
+  } finally {
+    if (wasConnected && getSupabaseConfig()) {
+      try {
+        await connectSyncIfConfigured(db);
+      } catch {
+        // Sync stays offline until the next app open.
+      }
+    }
+  }
+}
+
+async function syncJoinedGroupLocally(
+  db: AbstractPowerSyncDatabase,
+  config: SupabaseConfig,
+  joined: JoinGroupResult
+): Promise<JoinGroupResult> {
+  const normalized = normalizeJoinedResult(joined);
+
+  let members = normalized.members;
+  try {
+    const serverMembers = await fetchGroupMembersFromServer(
+      config,
+      normalized.id
+    );
+    if (serverMembers.length > 0) {
+      members = serverMembers;
+    }
+  } catch {
+    // Fall back to the join edge function roster.
+  }
+
+  const roster: JoinGroupResult = {
+    ...normalized,
+    members,
+    member:
+      members.find((member) => member.id === normalized.member.id) ??
+      normalized.member,
   };
+
+  await importRosterOffline(db, roster);
+  return roster;
+}
+
+/**
+ * Merges the server member roster into local SQLite when sync cleared it.
+ * Call when opening a joined group.
+ */
+export async function refreshGroupRosterFromServer(
+  db: AbstractPowerSyncDatabase,
+  groupId: string
+): Promise<void> {
+  const config = getSupabaseConfig();
+  if (!config || !getSyncConfig()) {
+    return;
+  }
+
+  const existing = await getGroup(db, groupId);
+  if (!existing) {
+    return;
+  }
+
+  let serverMembers: MemberRecord[];
+  try {
+    serverMembers = await fetchGroupMembersFromServer(config, groupId);
+  } catch {
+    return;
+  }
+
+  if (serverMembers.length === 0) {
+    return;
+  }
+
+  const localIds = new Set(existing.members.map((member) => member.id));
+  const missingOnDevice = serverMembers.some(
+    (member) => !localIds.has(member.id)
+  );
+  if (existing.members.length > 0 && !missingOnDevice) {
+    return;
+  }
+
+  await importRosterOffline(db, {
+    ...existing,
+    member: serverMembers[0]!,
+    members: serverMembers,
+  });
 }
 
 /** Upserts a joined group and member roster into local SQLite. */
@@ -94,7 +250,11 @@ export async function importJoinedGroup(
   db: AbstractPowerSyncDatabase,
   joined: JoinGroupResult
 ): Promise<GroupWithMembers> {
-  const { member: _joinedMember, members, ...group } = joined;
+  const {
+    member: _joinedMember,
+    members,
+    ...group
+  } = normalizeJoinedResult(joined);
 
   await db.writeTransaction(async (tx) => {
     const existingGroup = await tx.getOptional<{ id: string }>(
@@ -118,21 +278,26 @@ export async function importJoinedGroup(
     }
 
     for (const member of members) {
+      const normalized = normalizeMember(member, group.id);
+      if (!normalized.displayName) {
+        continue;
+      }
+
       const existingMember = await tx.getOptional<{ id: string }>(
         `SELECT id FROM members WHERE id = ?`,
-        [member.id]
+        [normalized.id]
       );
 
       if (existingMember) {
         await tx.execute(
           `UPDATE members SET group_id = ?, display_name = ? WHERE id = ?`,
-          [member.groupId, member.displayName, member.id]
+          [normalized.groupId, normalized.displayName, normalized.id]
         );
       } else {
         await tx.execute(
           `INSERT INTO members (id, group_id, display_name)
            VALUES (?, ?, ?)`,
-          [member.id, member.groupId, member.displayName]
+          [normalized.id, normalized.groupId, normalized.displayName]
         );
       }
     }
@@ -151,12 +316,10 @@ export async function joinGroup(
     throw new Error("Join requires cloud setup");
   }
 
-  const accessToken = await ensureSession(
+  const accessToken = await ensureAccessToken(
     config.supabaseUrl,
     config.supabaseAnonKey
   );
   const joined = await fetchJoinGroup(config, accessToken, input);
-  await importJoinedGroup(db, joined);
-
-  return joined;
+  return syncJoinedGroupLocally(db, config, joined);
 }

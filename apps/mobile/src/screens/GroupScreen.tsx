@@ -8,9 +8,11 @@ import { Button, Text } from "react-native-paper";
 import type { ExpenseRecord } from "../db/add-expense";
 import { getGroup } from "../db/create-group";
 import { useDatabase } from "../db/DatabaseProvider";
+import { refreshGroupRosterFromServer } from "../db/join-group";
 import type { ActivityRecord } from "../db/list-group-activities";
 import { listGroupActivities } from "../db/list-group-activities";
 import { listGroupExpenses } from "../db/list-group-expenses";
+import { useOnTablesChange } from "../db/use-on-tables-change";
 import { formatAmountCents, formatBalanceCents } from "../lib/format-balance";
 import type { RootStackParamList } from "../navigation/routes";
 
@@ -31,59 +33,68 @@ export function GroupScreen({ navigation, route }: Props) {
   const [expenses, setExpenses] = useState<ExpenseRecord[]>([]);
   const [activities, setActivities] = useState<ActivityRecord[]>([]);
 
+  const loadGroup = useCallback(async () => {
+    await refreshGroupRosterFromServer(db, groupId);
+    const group = await getGroup(db, groupId);
+    if (!group) {
+      return;
+    }
+
+    const [expenses, groupActivities] = await Promise.all([
+      listGroupExpenses(db, groupId),
+      listGroupActivities(db, groupId),
+    ]);
+    const ledgerBalances = computeBalances(
+      group.members.map((member) => ({ id: member.id })),
+      expenses.map((expense) => ({
+        id: expense.id,
+        amountCents: expense.amountCents,
+        contributions: expense.contributions.map((contribution) => ({
+          memberId: contribution.memberId,
+          amountCents: contribution.amountCents,
+        })),
+        allocations: expense.allocations.map((allocation) => ({
+          memberId: allocation.memberId,
+        })),
+      }))
+    );
+
+    const membersById = new Map(
+      group.members.map((member) => [member.id, member.displayName])
+    );
+
+    setGroupName(group.name);
+    setCurrency(group.currency);
+    setExpenses(expenses);
+    setActivities(groupActivities);
+    setBalances(
+      ledgerBalances.map((balance) => ({
+        memberId: balance.memberId,
+        displayName: membersById.get(balance.memberId) ?? balance.memberId,
+        balanceCents: balance.balanceCents,
+      }))
+    );
+  }, [db, groupId]);
+
   useFocusEffect(
     useCallback(() => {
-      let cancelled = false;
+      void loadGroup();
+    }, [loadGroup])
+  );
 
-      void (async () => {
-        const group = await getGroup(db, groupId);
-        if (!group || cancelled) {
-          return;
-        }
-
-        const [expenses, groupActivities] = await Promise.all([
-          listGroupExpenses(db, groupId),
-          listGroupActivities(db, groupId),
-        ]);
-        const ledgerBalances = computeBalances(
-          group.members.map((member) => ({ id: member.id })),
-          expenses.map((expense) => ({
-            id: expense.id,
-            amountCents: expense.amountCents,
-            contributions: expense.contributions.map((contribution) => ({
-              memberId: contribution.memberId,
-              amountCents: contribution.amountCents,
-            })),
-            allocations: expense.allocations.map((allocation) => ({
-              memberId: allocation.memberId,
-            })),
-          }))
-        );
-
-        const membersById = new Map(
-          group.members.map((member) => [member.id, member.displayName])
-        );
-
-        if (!cancelled) {
-          setGroupName(group.name);
-          setCurrency(group.currency);
-          setExpenses(expenses);
-          setActivities(groupActivities);
-          setBalances(
-            ledgerBalances.map((balance) => ({
-              memberId: balance.memberId,
-              displayName:
-                membersById.get(balance.memberId) ?? balance.memberId,
-              balanceCents: balance.balanceCents,
-            }))
-          );
-        }
-      })();
-
-      return () => {
-        cancelled = true;
-      };
-    }, [db, groupId])
+  useOnTablesChange(
+    db,
+    [
+      "groups",
+      "members",
+      "expenses",
+      "expense_contributions",
+      "expense_allocations",
+      "activities",
+    ],
+    () => {
+      void loadGroup();
+    }
   );
 
   return (

@@ -7,9 +7,12 @@ import { StyleSheet, View } from "react-native";
 import { Button, Text } from "react-native-paper";
 
 import { addExpense } from "../db/add-expense";
+import { flushPendingUploads } from "../db/connect-sync";
 import { getGroup } from "../db/create-group";
 import { useDatabase } from "../db/DatabaseProvider";
 import { listGroupExpenses } from "../db/list-group-expenses";
+import { isSyncConfigured } from "../db/sync-config";
+import { useOnTablesChange } from "../db/use-on-tables-change";
 import { formatAmountCents } from "../lib/format-balance";
 import type { RootStackParamList } from "../navigation/routes";
 
@@ -28,55 +31,61 @@ export function SettleUpScreen({ navigation, route }: Props) {
   const [recordingKey, setRecordingKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const loadSettlements = useCallback(async () => {
+    const group = await getGroup(db, groupId);
+    if (!group) {
+      return;
+    }
+
+    const expenses = await listGroupExpenses(db, groupId);
+    const balances = computeBalances(
+      group.members.map((member) => ({ id: member.id })),
+      expenses.map((expense) => ({
+        id: expense.id,
+        amountCents: expense.amountCents,
+        contributions: expense.contributions.map((contribution) => ({
+          memberId: contribution.memberId,
+          amountCents: contribution.amountCents,
+        })),
+        allocations: expense.allocations.map((allocation) => ({
+          memberId: allocation.memberId,
+        })),
+      }))
+    );
+    const suggested = computeSettlements(balances);
+    const membersById = new Map(
+      group.members.map((member) => [member.id, member.displayName])
+    );
+
+    setCurrency(group.currency);
+    setSettlements(
+      suggested.map((settlement) => ({
+        ...settlement,
+        fromName:
+          membersById.get(settlement.fromMemberId) ?? settlement.fromMemberId,
+        toName: membersById.get(settlement.toMemberId) ?? settlement.toMemberId,
+      }))
+    );
+  }, [db, groupId]);
+
   useFocusEffect(
     useCallback(() => {
-      let cancelled = false;
+      void loadSettlements();
+    }, [loadSettlements])
+  );
 
-      void (async () => {
-        const group = await getGroup(db, groupId);
-        if (!group || cancelled) {
-          return;
-        }
-
-        const expenses = await listGroupExpenses(db, groupId);
-        const balances = computeBalances(
-          group.members.map((member) => ({ id: member.id })),
-          expenses.map((expense) => ({
-            id: expense.id,
-            amountCents: expense.amountCents,
-            contributions: expense.contributions.map((contribution) => ({
-              memberId: contribution.memberId,
-              amountCents: contribution.amountCents,
-            })),
-            allocations: expense.allocations.map((allocation) => ({
-              memberId: allocation.memberId,
-            })),
-          }))
-        );
-        const suggested = computeSettlements(balances);
-        const membersById = new Map(
-          group.members.map((member) => [member.id, member.displayName])
-        );
-
-        if (!cancelled) {
-          setCurrency(group.currency);
-          setSettlements(
-            suggested.map((settlement) => ({
-              ...settlement,
-              fromName:
-                membersById.get(settlement.fromMemberId) ??
-                settlement.fromMemberId,
-              toName:
-                membersById.get(settlement.toMemberId) ?? settlement.toMemberId,
-            }))
-          );
-        }
-      })();
-
-      return () => {
-        cancelled = true;
-      };
-    }, [db, groupId])
+  useOnTablesChange(
+    db,
+    [
+      "groups",
+      "members",
+      "expenses",
+      "expense_contributions",
+      "expense_allocations",
+    ],
+    () => {
+      void loadSettlements();
+    }
   );
 
   async function recordSettlement(settlement: SettlementRow) {
@@ -97,6 +106,9 @@ export function SettleUpScreen({ navigation, route }: Props) {
         ],
         allocations: [{ memberId: settlement.toMemberId }],
       });
+      if (isSyncConfigured()) {
+        await flushPendingUploads(db);
+      }
       navigation.goBack();
     } catch (cause: unknown) {
       const message =

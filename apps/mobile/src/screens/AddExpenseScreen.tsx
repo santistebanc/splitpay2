@@ -1,11 +1,15 @@
+import { useFocusEffect } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
 
 import { addExpense } from "../db/add-expense";
+import { flushPendingUploads } from "../db/connect-sync";
 import { getGroup, type GroupWithMembers } from "../db/create-group";
 import { useDatabase } from "../db/DatabaseProvider";
+import { refreshGroupRosterFromServer } from "../db/join-group";
+import { isSyncConfigured } from "../db/sync-config";
 import { parseAmountToCents } from "../lib/parse-amount";
 import type { RootStackParamList } from "../navigation/routes";
 
@@ -21,14 +25,18 @@ export function AddExpenseScreen({ navigation, route }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    void getGroup(db, groupId).then((loaded) => {
-      setGroup(loaded);
-      if (loaded?.members[0]) {
-        setPaidByMemberId(loaded.members[0].id);
-      }
-    });
-  }, [db, groupId]);
+  useFocusEffect(
+    useCallback(() => {
+      void (async () => {
+        await refreshGroupRosterFromServer(db, groupId);
+        const loaded = await getGroup(db, groupId);
+        setGroup(loaded);
+        if (loaded?.members[0]) {
+          setPaidByMemberId((current) => current ?? loaded.members[0]!.id);
+        }
+      })();
+    }, [db, groupId])
+  );
 
   async function handleSave() {
     const amountCents = parseAmountToCents(amount);
@@ -58,6 +66,9 @@ export function AddExpenseScreen({ navigation, route }: Props) {
           memberId: member.id,
         })),
       });
+      if (isSyncConfigured()) {
+        await flushPendingUploads(db);
+      }
       navigation.goBack();
     } catch (cause: unknown) {
       const message =

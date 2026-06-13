@@ -1,13 +1,15 @@
 import { useFocusEffect } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FlatList, Pressable, StyleSheet, View } from "react-native";
 import { Button, Text } from "react-native-paper";
 
 import type { GroupRecord } from "../db/create-group";
 import { useDatabase } from "../db/DatabaseProvider";
 import { listGroups } from "../db/list-groups";
+import { useOnTablesChange } from "../db/use-on-tables-change";
 import { getKnownGroups } from "../lib/known-groups";
+import { STORAGE_KEYS } from "../lib/storage-keys";
 import type { RootStackParamList } from "../navigation/routes";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Groups">;
@@ -16,28 +18,39 @@ export function GroupsScreen({ navigation }: Props) {
   const db = useDatabase();
   const [groups, setGroups] = useState<GroupRecord[]>([]);
 
+  const loadGroups = useCallback(async () => {
+    const [allGroups, knownGroups] = await Promise.all([
+      listGroups(db),
+      getKnownGroups(),
+    ]);
+    const knownIds = new Set(knownGroups.map((group) => group.groupId));
+    setGroups(allGroups.filter((group) => knownIds.has(group.id)));
+  }, [db]);
+
   useFocusEffect(
     useCallback(() => {
-      let cancelled = false;
-
-      void (async () => {
-        const [allGroups, knownGroups] = await Promise.all([
-          listGroups(db),
-          getKnownGroups(),
-        ]);
-        const knownIds = new Set(knownGroups.map((group) => group.groupId));
-        const nextGroups = allGroups.filter((group) => knownIds.has(group.id));
-
-        if (!cancelled) {
-          setGroups(nextGroups);
-        }
-      })();
-
-      return () => {
-        cancelled = true;
-      };
-    }, [db])
+      void loadGroups();
+    }, [loadGroups])
   );
+
+  useOnTablesChange(db, ["groups", "members"], () => {
+    void loadGroups();
+  });
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === STORAGE_KEYS.knownGroups) {
+        void loadGroups();
+      }
+    };
+
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, [loadGroups]);
 
   return (
     <View style={styles.container}>

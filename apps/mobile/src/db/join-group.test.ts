@@ -1,12 +1,35 @@
 import { afterEach, describe, expect, it } from "vitest";
 
 import { createGroup, getGroup } from "./create-group.js";
-import { importJoinedGroup, type JoinGroupResult } from "./join-group.js";
+import {
+  importJoinedGroup,
+  normalizeMember,
+  type JoinGroupResult,
+} from "./join-group.js";
 import {
   closeTestDatabase,
   openTestDatabase,
   type TestDatabase,
 } from "./test-database.js";
+
+describe("normalizeMember", () => {
+  it("maps snake_case fields from PostgREST", () => {
+    expect(
+      normalizeMember(
+        {
+          id: "member-bob",
+          group_id: "group-joined",
+          display_name: "Bob",
+        },
+        "group-joined"
+      )
+    ).toEqual({
+      id: "member-bob",
+      groupId: "group-joined",
+      displayName: "Bob",
+    });
+  });
+});
 
 describe("importJoinedGroup", () => {
   let testDb: TestDatabase | undefined;
@@ -58,6 +81,42 @@ describe("importJoinedGroup", () => {
       createdAt: "2026-06-13T00:00:00.000Z",
       members: joined.members,
     });
+  });
+
+  it("imports snake_case members using the group id fallback", async () => {
+    testDb = await openTestDatabase();
+    const db = testDb.db;
+
+    await importJoinedGroup(db, {
+      id: "group-joined",
+      name: "Weekend trip",
+      joinCode: "ABCD2",
+      currency: "EUR",
+      createdAt: "2026-06-13T00:00:00.000Z",
+      member: {
+        id: "member-bob",
+        group_id: "group-joined",
+        display_name: "Bob",
+      } as unknown as JoinGroupResult["member"],
+      members: [
+        {
+          id: "member-alice",
+          group_id: "group-joined",
+          display_name: "Alice",
+        },
+        {
+          id: "member-bob",
+          group_id: "group-joined",
+          display_name: "Bob",
+        },
+      ] as unknown as JoinGroupResult["members"],
+    });
+
+    const loaded = await getGroup(db, "group-joined");
+    expect(loaded?.members.map((member) => member.displayName).sort()).toEqual([
+      "Alice",
+      "Bob",
+    ]);
   });
 
   it("merges members when the group already exists locally", async () => {

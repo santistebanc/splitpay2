@@ -1,18 +1,15 @@
 import {
   AbstractPowerSyncDatabase,
-  CrudEntry,
   PowerSyncBackendConnector,
   UpdateType,
 } from "@powersync/common";
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { ensureSupabaseSession, getSupabaseClient } from "./supabase-client";
 import type { SyncConfig } from "./sync-config";
+import { isDuplicateKeyError } from "./upload-errors";
 
-const FATAL_RESPONSE_CODES = [
-  new RegExp("^22...$"),
-  new RegExp("^23...$"),
-  new RegExp("^42501$"),
-];
+const FATAL_RESPONSE_CODES = [new RegExp("^22...$")];
 
 const UPLOAD_TABLE_ORDER = [
   "groups",
@@ -30,18 +27,6 @@ function uploadOrder(table: string): number {
   return index === -1 ? UPLOAD_TABLE_ORDER.length : index;
 }
 
-async function ensureSession(client: SupabaseClient): Promise<void> {
-  const { data } = await client.auth.getSession();
-  if (data.session) {
-    return;
-  }
-
-  const { error } = await client.auth.signInAnonymously();
-  if (error) {
-    throw error;
-  }
-}
-
 async function ensureGroupMembership(
   client: SupabaseClient,
   groupId: string
@@ -50,13 +35,19 @@ async function ensureGroupMembership(
     data: { session },
   } = await client.auth.getSession();
   if (!session?.user) {
-    return;
+    throw new Error(
+      "Cannot upload group data without an authenticated session"
+    );
   }
 
-  await client.from("group_memberships").insert({
+  const { error } = await client.from("group_memberships").insert({
     user_id: session.user.id,
     group_id: groupId,
   });
+
+  if (error && !isDuplicateKeyError(error)) {
+    throw error;
+  }
 }
 
 /** Creates a Supabase-backed PowerSync connector for the given client session. */
@@ -64,12 +55,11 @@ export function createSupabaseConnector(
   config: SyncConfig,
   client?: SupabaseClient
 ): PowerSyncBackendConnector {
-  const supabase =
-    client ?? createClient(config.supabaseUrl, config.supabaseAnonKey);
+  const supabase = client ?? getSupabaseClient(config);
 
   return {
     fetchCredentials: async () => {
-      await ensureSession(supabase);
+      await ensureSupabaseSession(config);
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -84,19 +74,19 @@ export function createSupabaseConnector(
     },
 
     uploadData: async (database: AbstractPowerSyncDatabase) => {
+      await ensureSupabaseSession(config);
+
       const transaction = await database.getNextCrudTransaction();
       if (!transaction) {
         return;
       }
 
-      let lastOp: CrudEntry | null = null;
       try {
         const operations = [...transaction.crud].sort(
           (left, right) => uploadOrder(left.table) - uploadOrder(right.table)
         );
 
         for (const op of operations) {
-          lastOp = op;
           const table = supabase.from(op.table);
           let result: { error: { code?: string; message: string } | null };
 
@@ -104,8 +94,20 @@ export function createSupabaseConnector(
             case UpdateType.PUT: {
               const record = { ...op.opData, id: op.id };
               result = await table.insert(record);
+              if (result.error && isDuplicateKeyError(result.error)) {
+                result = { error: null };
+              }
               if (op.table === "groups") {
                 await ensureGroupMembership(supabase, op.id);
+              }
+              if (op.table === "members") {
+                const groupId =
+                  typeof op.opData?.group_id === "string"
+                    ? op.opData.group_id
+                    : undefined;
+                if (groupId) {
+                  await ensureGroupMembership(supabase, groupId);
+                }
               }
               break;
             }

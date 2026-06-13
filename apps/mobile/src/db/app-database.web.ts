@@ -28,6 +28,9 @@ export async function initAppDatabase(): Promise<AbstractPowerSyncDatabase> {
           dbFilename: DB_FILENAME,
           worker: `${WORKER_BASE}/WASQLiteDB.umd.js`,
         }),
+        sync: {
+          worker: `${WORKER_BASE}/SharedSyncImplementation.umd.js`,
+        },
         flags: {
           disableSSRWarning: true,
         },

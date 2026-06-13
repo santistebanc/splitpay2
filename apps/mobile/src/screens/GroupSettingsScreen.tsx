@@ -7,6 +7,7 @@ import { Button, Text, TextInput } from "react-native-paper";
 import type { MemberRecord } from "../db/create-group";
 import { getGroup } from "../db/create-group";
 import { useDatabase } from "../db/DatabaseProvider";
+import { refreshGroupRosterFromServer } from "../db/join-group";
 import {
   addMember,
   isMemberReferenced,
@@ -14,6 +15,9 @@ import {
   renameGroup,
   renameMember,
 } from "../db/update-group";
+import { flushPendingUploads } from "../db/connect-sync";
+import { isSyncConfigured } from "../db/sync-config";
+import { useOnTablesChange } from "../db/use-on-tables-change";
 import {
   getKnownGroups,
   removeKnownGroup,
@@ -44,6 +48,7 @@ export function GroupSettingsScreen({ navigation, route }: Props) {
   const [exiting, setExiting] = useState(false);
 
   const loadSettings = useCallback(async () => {
+    await refreshGroupRosterFromServer(db, groupId);
     const group = await getGroup(db, groupId);
     if (!group) {
       setError("Group not found");
@@ -75,6 +80,16 @@ export function GroupSettingsScreen({ navigation, route }: Props) {
     }, [loadSettings])
   );
 
+  useOnTablesChange(db, ["groups", "members"], () => {
+    void loadSettings();
+  });
+
+  async function syncChanges(): Promise<void> {
+    if (isSyncConfigured()) {
+      await flushPendingUploads(db);
+    }
+  }
+
   async function handleSaveName() {
     setSavingName(true);
     setError(null);
@@ -82,6 +97,7 @@ export function GroupSettingsScreen({ navigation, route }: Props) {
     try {
       const updated = await renameGroup(db, groupId, groupName);
       setGroupName(updated.name);
+      await syncChanges();
     } catch (cause: unknown) {
       const message =
         cause instanceof Error ? cause.message : "Could not rename group";
@@ -98,6 +114,7 @@ export function GroupSettingsScreen({ navigation, route }: Props) {
     try {
       await addMember(db, groupId, newMemberName);
       setNewMemberName("");
+      await syncChanges();
       await loadSettings();
     } catch (cause: unknown) {
       const message =
@@ -114,6 +131,7 @@ export function GroupSettingsScreen({ navigation, route }: Props) {
 
     try {
       await renameMember(db, member.id, member.editName);
+      await syncChanges();
       await loadSettings();
     } catch (cause: unknown) {
       const message =
@@ -130,6 +148,7 @@ export function GroupSettingsScreen({ navigation, route }: Props) {
 
     try {
       await removeMember(db, memberId);
+      await syncChanges();
       await loadSettings();
     } catch (cause: unknown) {
       const message =

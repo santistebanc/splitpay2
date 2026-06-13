@@ -176,4 +176,72 @@ describe("PowerSync connect", () => {
       }
     }
   }, 120_000);
+
+  it("uploads members when the group row already exists on the server", async () => {
+    if (!(await isPowerSyncRunning())) {
+      return;
+    }
+
+    process.env.EXPO_PUBLIC_SUPABASE_URL = LOCAL_SUPABASE_URL;
+    process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY = LOCAL_ANON_KEY;
+    process.env.EXPO_PUBLIC_POWERSYNC_URL = LOCAL_POWERSYNC_URL;
+
+    const config = getSyncConfig();
+    expect(config).not.toBeNull();
+
+    const admin = createClient(LOCAL_SUPABASE_URL, LOCAL_SERVICE_ROLE_KEY);
+    const user = createClient(LOCAL_SUPABASE_URL, LOCAL_ANON_KEY);
+    const session = await user.auth.signInAnonymously();
+    expect(session.error).toBeNull();
+
+    const connector = createSupabaseConnector(config!, user);
+
+    let testDb: TestDatabase | undefined;
+
+    try {
+      testDb = await openTestDatabase("sync-duplicate-group");
+      const db = testDb.db;
+
+      await db.connect(connector);
+      await waitForSync(db);
+
+      const created = await createGroup(db, {
+        name: "Partial upload",
+        currency: "EUR",
+        memberNames: ["Alice", "Bob"],
+      });
+
+      await admin.from("groups").insert({
+        id: created.id,
+        name: created.name,
+        join_code: created.joinCode,
+        currency: created.currency,
+        created_at: created.createdAt,
+      });
+
+      await flushUploads(db, connector);
+
+      const members = await admin
+        .from("members")
+        .select("id, display_name")
+        .eq("group_id", created.id)
+        .order("display_name");
+      expect(members.error).toBeNull();
+      expect(members.data).toEqual([
+        { id: created.members[0]!.id, display_name: "Alice" },
+        { id: created.members[1]!.id, display_name: "Bob" },
+      ]);
+
+      const memberships = await admin
+        .from("group_memberships")
+        .select("user_id, group_id")
+        .eq("group_id", created.id);
+      expect(memberships.error).toBeNull();
+      expect(memberships.data).toHaveLength(1);
+    } finally {
+      if (testDb) {
+        await closeTestDatabase(testDb.db, testDb.dbPath);
+      }
+    }
+  }, 120_000);
 });

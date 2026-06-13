@@ -3,8 +3,10 @@ import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
 
+import { flushPendingUploads } from "../db/connect-sync";
 import { createGroup } from "../db/create-group";
 import { useDatabase } from "../db/DatabaseProvider";
+import { isSyncConfigured } from "../db/sync-config";
 import { addKnownGroup } from "../lib/known-groups";
 import type { RootStackParamList } from "../navigation/routes";
 
@@ -45,6 +47,9 @@ export function NewGroupScreen({ navigation }: Props) {
         currency: currency.trim() || "EUR",
         memberNames,
       });
+      if (isSyncConfigured()) {
+        await flushPendingUploads(db);
+      }
       await addKnownGroup(group.id);
       navigation.navigate("Groups");
     } catch (cause: unknown) {
