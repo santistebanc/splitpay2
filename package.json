@@ -13,6 +13,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
+    "test:sync": "vitest run powersync-sync.test.ts",
     "test:clean": "bash scripts/clean-test-dbs.sh",
     "test:e2e": "playwright test",
     "supabase:reset": "supabase db reset",
