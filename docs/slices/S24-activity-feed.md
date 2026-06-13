@@ -1,6 +1,6 @@
 # S24 — Activity feed
 
-**Status:** Done (awaiting confirm)
+**Status:** Done
 
 ## What changed
 

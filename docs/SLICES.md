@@ -2,7 +2,7 @@
 
 Micro-slices for gradual, test-driven development.
 
-**Next slice:** [S25 — Supabase migrations](./ROADMAP.md#sync--join--s25s28) (see [`ROADMAP.md`](./ROADMAP.md) for full plan)
+**Next slice:** [S26 — Edge function: join](./ROADMAP.md#sync--join--s25s28) (see [`ROADMAP.md`](./ROADMAP.md) for full plan)
 
 **How we work:** [`PROCESS.md`](./PROCESS.md)
 
@@ -35,11 +35,12 @@ Micro-slices for gradual, test-driven development.
 | [S22](slices/S22-settle-up.md)             | Settle screen                              |
 | [S23](slices/S23-group-settings.md)        | Group Settings screen                      |
 | [S24](slices/S24-activity-feed.md)         | Activity feed                              |
+| [S25](slices/S25-supabase-migrations.md)   | Supabase migrations                        |
 | [Prep](slices/prep-roadmap-and-process.md) | Roadmap, process, ADRs                     |
 
 ## Upcoming
 
-See [`ROADMAP.md`](./ROADMAP.md) — **S25** (Supabase migrations) through **S28** (Join UI).
+See [`ROADMAP.md`](./ROADMAP.md) — **S26** (Join edge function) through **S28** (Join UI).
 
 ## Verify
 
