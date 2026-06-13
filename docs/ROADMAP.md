@@ -79,14 +79,16 @@ Playwright starts at S17. Manual checklist in each slice doc.
 
 ---
 
-## Sync & join ⏳ (S25–S28+)
+## Sync & join ✅ (S25–S28)
 
-| Slice   | Status      | Summary                       | Exit criteria                    |
-| ------- | ----------- | ----------------------------- | -------------------------------- |
-| **S25** | ✅          | `supabase/` migrations        | `supabase db reset` locally      |
-| **S26** | ✅          | Edge function: join           | curl test against local Supabase |
-| **S27** | ✅          | PowerSync connect (env-gated) | Two clients sync one expense     |
-| **S28** | 🔜 **Next** | Join Group UI                 | Second client joins via code     |
+| Slice   | Status | Summary                       | Exit criteria                    |
+| ------- | ------ | ----------------------------- | -------------------------------- |
+| **S25** | ✅     | `supabase/` migrations        | `supabase db reset` locally      |
+| **S26** | ✅     | Edge function: join           | curl test against local Supabase |
+| **S27** | ✅     | PowerSync connect (env-gated) | Two clients sync one expense     |
+| **S28** | ✅     | Join Group UI                 | Second client joins via code     |
+
+**Beyond S28:** no slice marked **Next** yet. Candidates: live two-device join+sync manual path, integration CI job when `SUPABASE_*` secrets configured, native builds.
 
 Integration CI: optional job when `SUPABASE_*` secrets configured.
 

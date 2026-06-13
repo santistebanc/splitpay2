@@ -129,6 +129,23 @@ Deno.serve(async (request) => {
     );
   }
 
+  const authHeader = request.headers.get("Authorization");
+  if (authHeader) {
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+    if (anonKey) {
+      const userClient = createClient(supabaseUrl, anonKey, {
+        global: { headers: { Authorization: authHeader } },
+      });
+      const { data: userData } = await userClient.auth.getUser();
+      if (userData.user) {
+        await supabase.from("group_memberships").insert({
+          user_id: userData.user.id,
+          group_id: groupRow.id,
+        });
+      }
+    }
+  }
+
   const { data: memberRows, error: membersError } = await supabase
     .from("members")
     .select("id, group_id, display_name")

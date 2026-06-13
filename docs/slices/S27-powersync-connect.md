@@ -1,6 +1,6 @@
 # S27 — PowerSync connect (env-gated)
 
-**Status:** Done (awaiting confirm)
+**Status:** Done
 
 ## What changed
 

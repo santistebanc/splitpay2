@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { getSyncConfig, isSyncConfigured } from "./sync-config.js";
+import {
+  getSupabaseConfig,
+  getSyncConfig,
+  isSyncConfigured,
+} from "./sync-config.js";
 
 describe("sync config", () => {
   it("returns null when env vars are missing", () => {
@@ -24,6 +28,10 @@ describe("sync config", () => {
     process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY = "anon-key";
     process.env.EXPO_PUBLIC_POWERSYNC_URL = "http://127.0.0.1:8080";
 
+    expect(getSupabaseConfig()).toEqual({
+      supabaseUrl: "http://127.0.0.1:54321",
+      supabaseAnonKey: "anon-key",
+    });
     expect(getSyncConfig()).toEqual({
       supabaseUrl: "http://127.0.0.1:54321",
       supabaseAnonKey: "anon-key",

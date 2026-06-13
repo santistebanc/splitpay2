@@ -2,7 +2,7 @@
 
 Micro-slices for gradual, test-driven development.
 
-**Next slice:** [S28 — Join Group UI](./ROADMAP.md#sync--join--s25s28) (see [`ROADMAP.md`](./ROADMAP.md) for full plan)
+**Next slice:** None defined yet — see [`ROADMAP.md`](./ROADMAP.md)
 
 **How we work:** [`PROCESS.md`](./PROCESS.md)
 
@@ -38,11 +38,12 @@ Micro-slices for gradual, test-driven development.
 | [S25](slices/S25-supabase-migrations.md)   | Supabase migrations                        |
 | [S26](slices/S26-join-edge-function.md)    | Join edge function                         |
 | [S27](slices/S27-powersync-connect.md)     | PowerSync connect (env-gated)              |
+| [S28](slices/S28-join-group-ui.md)         | Join Group UI                              |
 | [Prep](slices/prep-roadmap-and-process.md) | Roadmap, process, ADRs                     |
 
 ## Upcoming
 
-See [`ROADMAP.md`](./ROADMAP.md) — **S28** (Join Group UI).
+See [`ROADMAP.md`](./ROADMAP.md) — no slice marked **Next** yet.
 
 ## Verify
 
