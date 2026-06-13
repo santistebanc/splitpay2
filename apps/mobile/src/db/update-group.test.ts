@@ -1,4 +1,3 @@
-import { PowerSyncDatabase } from "@powersync/node";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { addExpense } from "./add-expense.js";
@@ -10,29 +9,25 @@ import {
   renameGroup,
   renameMember,
 } from "./update-group.js";
-import { AppSchema } from "./schema.js";
-
-async function openTestDatabase(): Promise<PowerSyncDatabase> {
-  const db = new PowerSyncDatabase({
-    schema: AppSchema,
-    database: { dbFilename: `splitpay-test-${crypto.randomUUID()}.db` },
-  });
-  await db.init();
-  return db;
-}
+import {
+  closeTestDatabase,
+  openTestDatabase,
+  type TestDatabase,
+} from "./test-database.js";
 
 describe("renameGroup", () => {
-  let db: PowerSyncDatabase | undefined;
+  let testDb: TestDatabase | undefined;
 
   afterEach(async () => {
-    if (db) {
-      await db.close();
-      db = undefined;
+    if (testDb) {
+      await closeTestDatabase(testDb.db, testDb.dbPath);
+      testDb = undefined;
     }
   });
 
   it("updates the group name", async () => {
-    db = await openTestDatabase();
+    testDb = await openTestDatabase();
+    const db = testDb.db;
     const group = await createGroup(db, {
       name: "Beach trip",
       currency: "EUR",
@@ -47,17 +42,18 @@ describe("renameGroup", () => {
 });
 
 describe("addMember", () => {
-  let db: PowerSyncDatabase | undefined;
+  let testDb: TestDatabase | undefined;
 
   afterEach(async () => {
-    if (db) {
-      await db.close();
-      db = undefined;
+    if (testDb) {
+      await closeTestDatabase(testDb.db, testDb.dbPath);
+      testDb = undefined;
     }
   });
 
   it("adds a member to the group roster", async () => {
-    db = await openTestDatabase();
+    testDb = await openTestDatabase();
+    const db = testDb.db;
     const group = await createGroup(db, {
       name: "Beach trip",
       currency: "EUR",
@@ -77,17 +73,18 @@ describe("addMember", () => {
 });
 
 describe("renameMember", () => {
-  let db: PowerSyncDatabase | undefined;
+  let testDb: TestDatabase | undefined;
 
   afterEach(async () => {
-    if (db) {
-      await db.close();
-      db = undefined;
+    if (testDb) {
+      await closeTestDatabase(testDb.db, testDb.dbPath);
+      testDb = undefined;
     }
   });
 
   it("updates a member display name", async () => {
-    db = await openTestDatabase();
+    testDb = await openTestDatabase();
+    const db = testDb.db;
     const group = await createGroup(db, {
       name: "Beach trip",
       currency: "EUR",
@@ -105,17 +102,18 @@ describe("renameMember", () => {
 });
 
 describe("removeMember", () => {
-  let db: PowerSyncDatabase | undefined;
+  let testDb: TestDatabase | undefined;
 
   afterEach(async () => {
-    if (db) {
-      await db.close();
-      db = undefined;
+    if (testDb) {
+      await closeTestDatabase(testDb.db, testDb.dbPath);
+      testDb = undefined;
     }
   });
 
   it("removes a member with no expense references", async () => {
-    db = await openTestDatabase();
+    testDb = await openTestDatabase();
+    const db = testDb.db;
     const group = await createGroup(db, {
       name: "Beach trip",
       currency: "EUR",
@@ -134,7 +132,8 @@ describe("removeMember", () => {
   });
 
   it("throws when the member is referenced by an expense", async () => {
-    db = await openTestDatabase();
+    testDb = await openTestDatabase();
+    const db = testDb.db;
     const group = await createGroup(db, {
       name: "Beach trip",
       currency: "EUR",

@@ -97,22 +97,23 @@ export async function addExpense(
 
     for (const contribution of input.contributions) {
       await tx.execute(
-        `INSERT INTO expense_contributions (id, expense_id, member_id, amount_cents)
-         VALUES (?, ?, ?, ?)`,
+        `INSERT INTO expense_contributions (id, expense_id, member_id, amount_cents, group_id)
+         VALUES (?, ?, ?, ?, ?)`,
         [
           crypto.randomUUID(),
           expenseId,
           contribution.memberId,
           contribution.amountCents,
+          input.groupId,
         ]
       );
     }
 
     for (const allocation of input.allocations) {
       await tx.execute(
-        `INSERT INTO expense_allocations (id, expense_id, member_id)
-         VALUES (?, ?, ?)`,
-        [crypto.randomUUID(), expenseId, allocation.memberId]
+        `INSERT INTO expense_allocations (id, expense_id, member_id, group_id)
+         VALUES (?, ?, ?, ?)`,
+        [crypto.randomUUID(), expenseId, allocation.memberId, input.groupId]
       );
     }
 

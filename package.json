@@ -13,8 +13,10 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
+    "test:clean": "bash scripts/clean-test-dbs.sh",
     "test:e2e": "playwright test",
     "supabase:reset": "supabase db reset",
+    "powersync:start": "bash scripts/start-powersync.sh",
     "prepare": "husky"
   },
   "devDependencies": {

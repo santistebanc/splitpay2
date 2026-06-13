@@ -9,6 +9,7 @@ import {
 import { Text } from "react-native-paper";
 
 import { initAppDatabase } from "./app-database";
+import { connectSyncIfConfigured } from "./connect-sync";
 
 const DatabaseContext = createContext<AbstractPowerSyncDatabase | null>(null);
 
@@ -22,7 +23,14 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
 
   useEffect(() => {
     void initAppDatabase()
-      .then(setDb)
+      .then(async (database) => {
+        try {
+          await connectSyncIfConfigured(database);
+        } catch {
+          // Stay offline when sync is unavailable.
+        }
+        setDb(database);
+      })
       .catch((cause: unknown) => {
         const message =
           cause instanceof Error ? cause.message : "Database failed to open";

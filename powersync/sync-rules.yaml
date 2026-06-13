@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=https://unpkg.com/@powersync/service-sync-rules@latest/schema/sync_rules.json
+
+bucket_definitions:
+  user_group:
+    parameters: SELECT group_id FROM group_memberships WHERE user_id = request.user_id()
+    data:
+      - SELECT * FROM groups WHERE id = bucket.group_id
+      - SELECT * FROM members WHERE group_id = bucket.group_id
+      - SELECT * FROM expenses WHERE group_id = bucket.group_id
+      - SELECT * FROM expense_contributions WHERE group_id = bucket.group_id
+      - SELECT * FROM expense_allocations WHERE group_id = bucket.group_id
+      - SELECT * FROM activities WHERE group_id = bucket.group_id

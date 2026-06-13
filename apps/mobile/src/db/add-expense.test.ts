@@ -1,32 +1,27 @@
-import { PowerSyncDatabase } from "@powersync/node";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { addExpense, getExpense } from "./add-expense.js";
 import { createGroup } from "./create-group.js";
 import { listGroupActivities } from "./list-group-activities.js";
-import { AppSchema } from "./schema.js";
-
-async function openTestDatabase(): Promise<PowerSyncDatabase> {
-  const db = new PowerSyncDatabase({
-    schema: AppSchema,
-    database: { dbFilename: `splitpay-test-${crypto.randomUUID()}.db` },
-  });
-  await db.init();
-  return db;
-}
+import {
+  closeTestDatabase,
+  openTestDatabase,
+  type TestDatabase,
+} from "./test-database.js";
 
 describe("addExpense", () => {
-  let db: PowerSyncDatabase | undefined;
+  let testDb: TestDatabase | undefined;
 
   afterEach(async () => {
-    if (db) {
-      await db.close();
-      db = undefined;
+    if (testDb) {
+      await closeTestDatabase(testDb.db, testDb.dbPath);
+      testDb = undefined;
     }
   });
 
   it("persists an expense with contributions and allocation snapshot", async () => {
-    db = await openTestDatabase();
+    testDb = await openTestDatabase();
+    const db = testDb.db;
     const group = await createGroup(db, {
       name: "Ski weekend",
       currency: "EUR",
@@ -67,7 +62,8 @@ describe("addExpense", () => {
   });
 
   it("returns null when the expense id is unknown", async () => {
-    db = await openTestDatabase();
+    testDb = await openTestDatabase();
+    const db = testDb.db;
 
     await expect(getExpense(db, "missing-expense")).resolves.toBeNull();
   });

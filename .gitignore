@@ -8,6 +8,8 @@ dist/
 .DS_Store
 .env
 .env.*
-splitpay-test-*.db
-splitpay-test-*.db-shm
-splitpay-test-*.db-wal
+splitpay-test-*.db*
+sync-a-*.db*
+sync-b-*.db*
+splitpay-*.db*
+debug-sync.db*

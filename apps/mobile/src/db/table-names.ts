@@ -1,5 +1,5 @@
 /** Bumped when client-side table layout changes (PowerSync applies on open). */
-export const APP_SCHEMA_VERSION = 3;
+export const APP_SCHEMA_VERSION = 5;
 
 export const APP_TABLE_NAMES = [
   "groups",

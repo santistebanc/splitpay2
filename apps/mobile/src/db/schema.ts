@@ -12,7 +12,7 @@ const groups = new Table(
     currency: column.text,
     created_at: column.text,
   },
-  { indexes: { join_code: ["join_code"] }, localOnly: true }
+  { indexes: { join_code: ["join_code"] } }
 );
 
 const members = new Table(
@@ -20,7 +20,7 @@ const members = new Table(
     group_id: column.text,
     display_name: column.text,
   },
-  { indexes: { group: ["group_id"] }, localOnly: true }
+  { indexes: { group: ["group_id"] } }
 );
 
 const expenses = new Table(
@@ -30,7 +30,7 @@ const expenses = new Table(
     created_at: column.text,
     note: column.text,
   },
-  { indexes: { group: ["group_id"] }, localOnly: true }
+  { indexes: { group: ["group_id"] } }
 );
 
 const expense_contributions = new Table(
@@ -38,16 +38,18 @@ const expense_contributions = new Table(
     expense_id: column.text,
     member_id: column.text,
     amount_cents: column.integer,
+    group_id: column.text,
   },
-  { indexes: { expense: ["expense_id"] }, localOnly: true }
+  { indexes: { expense: ["expense_id"], group: ["group_id"] } }
 );
 
 const expense_allocations = new Table(
   {
     expense_id: column.text,
     member_id: column.text,
+    group_id: column.text,
   },
-  { indexes: { expense: ["expense_id"] }, localOnly: true }
+  { indexes: { expense: ["expense_id"], group: ["group_id"] } }
 );
 
 const activities = new Table(
@@ -58,7 +60,7 @@ const activities = new Table(
     expense_id: column.text,
     created_at: column.text,
   },
-  { indexes: { group: ["group_id"] }, localOnly: true }
+  { indexes: { group: ["group_id"] } }
 );
 
 export const AppSchema = new Schema({
