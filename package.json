@@ -8,14 +8,15 @@
   "scripts": {
     "verify": "npm run typecheck && npm run format:check && npm run test && npm run test:e2e",
     "ci": "npm run verify",
-    "web": "npm run web --workspace=@splitpay/mobile",
+    "web": "npm run web:sync --workspace=@splitpay/mobile",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:sync": "vitest run powersync-sync.test.ts",
+    "test:e2e:sync": "PLAYWRIGHT_SYNC_E2E=1 playwright test e2e/two-device-sync.spec.ts",
     "test:clean": "bash scripts/clean-test-dbs.sh",
-    "test:e2e": "playwright test",
+    "test:e2e": "CI=1 playwright test",
     "supabase:reset": "supabase db reset",
     "powersync:start": "bash scripts/start-powersync.sh",
     "prepare": "husky"

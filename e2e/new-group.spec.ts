@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import { groupRow } from "./helpers/groups";
+
 test("creates a group and shows it on the home screen", async ({ page }) => {
   test.setTimeout(60_000);
 
@@ -16,5 +18,5 @@ test("creates a group and shows it on the home screen", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Groups" })).toBeVisible({
     timeout: 30_000,
   });
-  await expect(page.getByText("Beach trip")).toBeVisible();
+  await expect(groupRow(page, "Beach trip")).toBeVisible();
 });

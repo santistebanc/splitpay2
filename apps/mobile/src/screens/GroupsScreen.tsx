@@ -72,7 +72,7 @@ export function GroupsScreen({ navigation }: Props) {
             onPress={() => navigation.navigate("Group", { groupId: group.id })}
           >
             <Text variant="titleMedium">{group.name}</Text>
-            <Text variant="bodySmall">
+            <Text variant="bodySmall" testID={`group-meta-${group.id}`}>
               {group.currency} · {group.joinCode}
             </Text>
           </Pressable>

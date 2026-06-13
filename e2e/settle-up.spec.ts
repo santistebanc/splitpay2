@@ -1,16 +1,10 @@
 import { expect, test, type Page } from "@playwright/test";
 
+import { createBeachTripGroup } from "./helpers/groups";
+
 async function createBeachTripWithLunch(page: Page) {
   await page.goto("/", { waitUntil: "load" });
-
-  await page.getByRole("button", { name: "New Group" }).click();
-  const textboxes = page.getByRole("textbox");
-  await textboxes.nth(0).fill("Beach trip");
-  await textboxes.nth(2).fill("Alice, Bob");
-  await page.getByRole("button", { name: "Create group" }).click();
-
-  await expect(page.getByText("Beach trip")).toBeVisible({ timeout: 30_000 });
-  await page.getByText("Beach trip").click();
+  await createBeachTripGroup(page);
 
   await page.getByRole("button", { name: "Add Expense" }).click();
   const expenseFields = page.getByRole("textbox");

@@ -51,5 +51,7 @@ test("joins a group by code and shows it on the home screen", async ({
   await expect(page.getByRole("heading", { name: "Groups" })).toBeVisible({
     timeout: 30_000,
   });
-  await expect(page.getByText("Trip from host")).toBeVisible();
+  await expect(
+    page.getByTestId("groups-list").getByText("Trip from host")
+  ).toBeVisible();
 });

@@ -1,0 +1,45 @@
+name: Sync integration
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  sync-integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - run: npm ci
+
+      - name: Start Supabase
+        run: supabase start -x vector
+
+      - name: Reset database
+        run: npm run supabase:reset
+
+      - name: Start PowerSync
+        run: npm run powersync:start
+
+      - name: PowerSync regression tests
+        run: npm run test:sync
+
+      - name: Install Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Two-device sync e2e
+        run: npm run test:e2e:sync
+        env:
+          CI: "1"
+          PLAYWRIGHT_SYNC_E2E: "1"

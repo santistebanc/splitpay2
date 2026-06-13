@@ -99,7 +99,9 @@ export function GroupScreen({ navigation, route }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text variant="headlineSmall">{groupName || "Group"}</Text>
+      <Text variant="headlineSmall" testID="group-title">
+        {groupName || "Group"}
+      </Text>
       <View testID="balances-panel" style={styles.balances}>
         <Text variant="titleMedium">Balances</Text>
         {balances.length === 0 ? (

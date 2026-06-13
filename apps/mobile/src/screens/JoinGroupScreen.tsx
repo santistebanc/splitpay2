@@ -46,7 +46,7 @@ export function JoinGroupScreen({ navigation }: Props) {
       await addKnownGroup(joined.id, undefined, {
         assumedMemberId: joined.member.id,
       });
-      navigation.navigate("Groups");
+      navigation.goBack();
     } catch (cause: unknown) {
       const message =
         cause instanceof Error ? cause.message : "Could not join group";

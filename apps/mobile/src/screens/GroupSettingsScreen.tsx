@@ -37,6 +37,7 @@ export function GroupSettingsScreen({ navigation, route }: Props) {
   const { groupId } = route.params;
   const db = useDatabase();
   const [groupName, setGroupName] = useState("");
+  const [groupNameDirty, setGroupNameDirty] = useState(false);
   const [members, setMembers] = useState<MemberRowState[]>([]);
   const [assumedMemberId, setAssumedMemberId] = useState<string | null>(null);
   const [newMemberName, setNewMemberName] = useState("");
@@ -63,6 +64,7 @@ export function GroupSettingsScreen({ navigation, route }: Props) {
     );
 
     setGroupName(group.name);
+    setGroupNameDirty(false);
     setAssumedMemberId(resolveAssumedMemberId(knownGroup, memberIds));
     setMembers(
       group.members.map((member, index) => ({
@@ -81,7 +83,9 @@ export function GroupSettingsScreen({ navigation, route }: Props) {
   );
 
   useOnTablesChange(db, ["groups", "members"], () => {
-    void loadSettings();
+    if (!groupNameDirty && !savingName) {
+      void loadSettings();
+    }
   });
 
   async function syncChanges(): Promise<void> {
@@ -196,7 +200,10 @@ export function GroupSettingsScreen({ navigation, route }: Props) {
         label="Group name"
         accessibilityLabel="Group name"
         value={groupName}
-        onChangeText={setGroupName}
+        onChangeText={(value) => {
+          setGroupNameDirty(true);
+          setGroupName(value);
+        }}
         testID="settings-group-name-input"
         autoCapitalize="words"
       />

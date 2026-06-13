@@ -1,5 +1,11 @@
 import { defineConfig, devices } from "@playwright/test";
 
+const LOCAL_SUPABASE_URL = "http://127.0.0.1:54321";
+const LOCAL_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0";
+
+const syncE2e = process.env.PLAYWRIGHT_SYNC_E2E === "1";
+
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: false,
@@ -15,18 +21,23 @@ export default defineConfig({
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
+      testIgnore: syncE2e ? undefined : ["**/two-device-sync.spec.ts"],
+      testMatch: syncE2e ? ["**/two-device-sync.spec.ts"] : undefined,
     },
   ],
   webServer: {
-    command: "CI=1 npm run web",
+    command: syncE2e
+      ? "CI=1 npm run web:sync --workspace=@splitpay/mobile"
+      : "CI=1 npm run web --workspace=@splitpay/mobile",
     url: "http://localhost:8081",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
     env: {
-      EXPO_PUBLIC_SUPABASE_URL: "http://127.0.0.1:54321",
-      EXPO_PUBLIC_SUPABASE_ANON_KEY:
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0",
-      EXPO_PUBLIC_POWERSYNC_URL: "http://127.0.0.1:8080",
+      EXPO_PUBLIC_SUPABASE_URL: LOCAL_SUPABASE_URL,
+      EXPO_PUBLIC_SUPABASE_ANON_KEY: LOCAL_ANON_KEY,
+      ...(syncE2e
+        ? { EXPO_PUBLIC_POWERSYNC_URL: "http://127.0.0.1:8080" }
+        : {}),
     },
   },
 });

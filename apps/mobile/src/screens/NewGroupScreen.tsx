@@ -51,7 +51,7 @@ export function NewGroupScreen({ navigation }: Props) {
         await flushPendingUploads(db);
       }
       await addKnownGroup(group.id);
-      navigation.navigate("Groups");
+      navigation.goBack();
     } catch (cause: unknown) {
       const message =
         cause instanceof Error ? cause.message : "Could not create group";

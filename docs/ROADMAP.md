@@ -79,18 +79,21 @@ Playwright starts at S17. Manual checklist in each slice doc.
 
 ---
 
-## Sync & join ✅ (S25–S28)
+## Sync & join ✅ (S25–S29)
 
-| Slice   | Status | Summary                       | Exit criteria                    |
-| ------- | ------ | ----------------------------- | -------------------------------- |
-| **S25** | ✅     | `supabase/` migrations        | `supabase db reset` locally      |
-| **S26** | ✅     | Edge function: join           | curl test against local Supabase |
-| **S27** | ✅     | PowerSync connect (env-gated) | Two clients sync one expense     |
-| **S28** | ✅     | Join Group UI                 | Second client joins via code     |
+| Slice   | Status | Summary                       | Exit criteria                        |
+| ------- | ------ | ----------------------------- | ------------------------------------ |
+| **S25** | ✅     | `supabase/` migrations        | `supabase db reset` locally          |
+| **S26** | ✅     | Edge function: join           | curl test against local Supabase     |
+| **S27** | ✅     | PowerSync connect (env-gated) | Two clients sync one expense         |
+| **S28** | ✅     | Join Group UI                 | Second client joins via code         |
+| **S29** | ✅     | Two-device sync e2e + CI      | Playwright join+expense; sync CI job |
 
-**Beyond S28:** no slice marked **Next** yet. Candidates: live two-device join+sync manual path, integration CI job when `SUPABASE_*` secrets configured, native builds.
+Post-S28 hardening (upload + live UI): [`slices/sync-upload-hardening.md`](./slices/sync-upload-hardening.md)
 
-Integration CI: optional job when `SUPABASE_*` secrets configured.
+**Beyond S29:** no slice marked **Next** yet. Candidates: native builds, production Supabase/PowerSync deploy, real auth.
+
+Integration CI: `.github/workflows/sync-integration.yml` (Supabase + PowerSync in Docker on GitHub Actions).
 
 ---
 

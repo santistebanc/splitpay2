@@ -2,7 +2,10 @@ import type { AbstractPowerSyncDatabase } from "@powersync/common";
 
 import { getGroup } from "./create-group";
 import type { GroupWithMembers, MemberRecord } from "./create-group";
-import { connectSyncIfConfigured } from "./connect-sync";
+import {
+  connectSyncIfConfigured,
+  reconnectSyncIfConfigured,
+} from "./connect-sync";
 import { isValidJoinCode } from "./join-code";
 import { getSupabaseClient } from "./supabase-client";
 import {
@@ -321,5 +324,7 @@ export async function joinGroup(
     config.supabaseAnonKey
   );
   const joined = await fetchJoinGroup(config, accessToken, input);
-  return syncJoinedGroupLocally(db, config, joined);
+  const result = await syncJoinedGroupLocally(db, config, joined);
+  await reconnectSyncIfConfigured(db);
+  return result;
 }
