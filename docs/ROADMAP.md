@@ -84,8 +84,8 @@ Playwright starts at S17. Manual checklist in each slice doc.
 | Slice   | Status      | Summary                       | Exit criteria                    |
 | ------- | ----------- | ----------------------------- | -------------------------------- |
 | **S25** | ✅          | `supabase/` migrations        | `supabase db reset` locally      |
-| **S26** | 🔜 **Next** | Edge function: join           | curl test against local Supabase |
-| S27     | ⏳          | PowerSync connect (env-gated) | Two clients sync one expense     |
+| **S26** | ✅          | Edge function: join           | curl test against local Supabase |
+| **S27** | 🔜 **Next** | PowerSync connect (env-gated) | Two clients sync one expense     |
 | S28     | ⏳          | Join Group UI                 | Second client joins via code     |
 
 Integration CI: optional job when `SUPABASE_*` secrets configured.

@@ -2,7 +2,7 @@
 
 Micro-slices for gradual, test-driven development.
 
-**Next slice:** [S26 — Edge function: join](./ROADMAP.md#sync--join--s25s28) (see [`ROADMAP.md`](./ROADMAP.md) for full plan)
+**Next slice:** [S27 — PowerSync connect](./ROADMAP.md#sync--join--s25s28) (see [`ROADMAP.md`](./ROADMAP.md) for full plan)
 
 **How we work:** [`PROCESS.md`](./PROCESS.md)
 
@@ -36,11 +36,12 @@ Micro-slices for gradual, test-driven development.
 | [S23](slices/S23-group-settings.md)        | Group Settings screen                      |
 | [S24](slices/S24-activity-feed.md)         | Activity feed                              |
 | [S25](slices/S25-supabase-migrations.md)   | Supabase migrations                        |
+| [S26](slices/S26-join-edge-function.md)    | Join edge function                         |
 | [Prep](slices/prep-roadmap-and-process.md) | Roadmap, process, ADRs                     |
 
 ## Upcoming
 
-See [`ROADMAP.md`](./ROADMAP.md) — **S26** (Join edge function) through **S28** (Join UI).
+See [`ROADMAP.md`](./ROADMAP.md) — **S27** (PowerSync connect) through **S28** (Join UI).
 
 ## Verify
 
