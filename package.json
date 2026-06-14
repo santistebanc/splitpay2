@@ -9,6 +9,15 @@
     "verify": "npm run typecheck && npm run format:check && npm run test && npm run test:e2e",
     "ci": "npm run verify",
     "web": "npm run web:sync --workspace=@splitpay/mobile",
+    "mobile": "npm run start --workspace=@splitpay/mobile",
+    "mobile:tunnel": "npm run start:tunnel --workspace=@splitpay/mobile",
+    "mobile:dev": "bash scripts/start-mobile-dev.sh",
+    "mobile:sync": "bash scripts/start-mobile-sync.sh",
+    "mobile:android": "npm run android --workspace=@splitpay/mobile",
+    "mobile:android:wsl": "bash scripts/mobile-android-wsl.sh",
+    "mobile:android:setup": "bash scripts/setup-android-sdk-wsl.sh",
+    "mobile:android:win": "bash scripts/mobile-android-windows.sh",
+    "mobile:adb:qr": "npx --yes adb-qr@latest qr",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -19,7 +28,8 @@
     "test:e2e": "CI=1 playwright test",
     "supabase:reset": "supabase db reset",
     "powersync:start": "bash scripts/start-powersync.sh",
-    "prepare": "husky"
+    "prepare": "husky",
+    "postinstall": "node scripts/patch-react-native-gradle.js"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",

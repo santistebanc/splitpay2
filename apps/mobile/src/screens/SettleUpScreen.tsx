@@ -1,18 +1,17 @@
-import { useFocusEffect } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { computeBalances, computeSettlements } from "@splitpay/ledger";
 import type { Settlement } from "@splitpay/ledger";
-import { useCallback, useState } from "react";
+import { useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Button, Text } from "react-native-paper";
 
 import { addExpense } from "../db/add-expense";
 import { flushPendingUploads } from "../db/connect-sync";
-import { getGroup } from "../db/create-group";
 import { useDatabase } from "../db/DatabaseProvider";
-import { listGroupExpenses } from "../db/list-group-expenses";
+import { useGroupExpenses } from "../db/hooks/use-group-queries";
+import { useGroupWithMembers } from "../db/hooks/use-group-with-members";
+import { useSyncOnFocus } from "../db/hooks/use-sync-on-focus";
 import { isSyncConfigured } from "../db/sync-config";
-import { useOnTablesChange } from "../db/use-on-tables-change";
 import { formatAmountCents } from "../lib/format-balance";
 import type { RootStackParamList } from "../navigation/routes";
 
@@ -26,18 +25,19 @@ type SettlementRow = Settlement & {
 export function SettleUpScreen({ navigation, route }: Props) {
   const { groupId } = route.params;
   const db = useDatabase();
-  const [currency, setCurrency] = useState("EUR");
-  const [settlements, setSettlements] = useState<SettlementRow[]>([]);
+
+  useSyncOnFocus(groupId);
+
+  const { group } = useGroupWithMembers(groupId);
+  const { expenses } = useGroupExpenses(groupId);
   const [recordingKey, setRecordingKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const loadSettlements = useCallback(async () => {
-    const group = await getGroup(db, groupId);
+  const settlements = useMemo((): SettlementRow[] => {
     if (!group) {
-      return;
+      return [];
     }
 
-    const expenses = await listGroupExpenses(db, groupId);
     const balances = computeBalances(
       group.members.map((member) => ({ id: member.id })),
       expenses.map((expense) => ({
@@ -57,36 +57,15 @@ export function SettleUpScreen({ navigation, route }: Props) {
       group.members.map((member) => [member.id, member.displayName])
     );
 
-    setCurrency(group.currency);
-    setSettlements(
-      suggested.map((settlement) => ({
-        ...settlement,
-        fromName:
-          membersById.get(settlement.fromMemberId) ?? settlement.fromMemberId,
-        toName: membersById.get(settlement.toMemberId) ?? settlement.toMemberId,
-      }))
-    );
-  }, [db, groupId]);
+    return suggested.map((settlement) => ({
+      ...settlement,
+      fromName:
+        membersById.get(settlement.fromMemberId) ?? settlement.fromMemberId,
+      toName: membersById.get(settlement.toMemberId) ?? settlement.toMemberId,
+    }));
+  }, [group, expenses]);
 
-  useFocusEffect(
-    useCallback(() => {
-      void loadSettlements();
-    }, [loadSettlements])
-  );
-
-  useOnTablesChange(
-    db,
-    [
-      "groups",
-      "members",
-      "expenses",
-      "expense_contributions",
-      "expense_allocations",
-    ],
-    () => {
-      void loadSettlements();
-    }
-  );
+  const currency = group?.currency ?? "EUR";
 
   async function recordSettlement(settlement: SettlementRow) {
     const key = `${settlement.fromMemberId}-${settlement.toMemberId}`;

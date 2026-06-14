@@ -1,23 +1,21 @@
-import { useFocusEffect } from "@react-navigation/native";
+import { useQuery } from "@powersync/react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
 
 import type { MemberRecord } from "../db/create-group";
-import { getGroup } from "../db/create-group";
+import { flushPendingUploads } from "../db/connect-sync";
 import { useDatabase } from "../db/DatabaseProvider";
-import { refreshGroupRosterFromServer } from "../db/join-group";
+import { useSyncOnFocus } from "../db/hooks/use-sync-on-focus";
+import { useGroupWithMembers } from "../db/hooks/use-group-with-members";
 import {
   addMember,
-  isMemberReferenced,
   removeMember,
   renameGroup,
   renameMember,
 } from "../db/update-group";
-import { flushPendingUploads } from "../db/connect-sync";
 import { isSyncConfigured } from "../db/sync-config";
-import { useOnTablesChange } from "../db/use-on-tables-change";
 import {
   getKnownGroups,
   removeKnownGroup,
@@ -36,9 +34,25 @@ type MemberRowState = MemberRecord & {
 export function GroupSettingsScreen({ navigation, route }: Props) {
   const { groupId } = route.params;
   const db = useDatabase();
+
+  useSyncOnFocus(groupId);
+
+  const { group } = useGroupWithMembers(groupId);
+  const { data: referencedRows = [] } = useQuery<{ member_id: string }>(
+    `SELECT DISTINCT ec.member_id
+     FROM expense_contributions ec
+     INNER JOIN expenses e ON e.id = ec.expense_id
+     WHERE e.group_id = ?
+     UNION
+     SELECT DISTINCT ea.member_id
+     FROM expense_allocations ea
+     INNER JOIN expenses e ON e.id = ea.expense_id
+     WHERE e.group_id = ?`,
+    [groupId, groupId]
+  );
+
   const [groupName, setGroupName] = useState("");
   const [groupNameDirty, setGroupNameDirty] = useState(false);
-  const [members, setMembers] = useState<MemberRowState[]>([]);
   const [assumedMemberId, setAssumedMemberId] = useState<string | null>(null);
   const [newMemberName, setNewMemberName] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -47,46 +61,64 @@ export function GroupSettingsScreen({ navigation, route }: Props) {
   const [renamingMemberId, setRenamingMemberId] = useState<string | null>(null);
   const [removingMemberId, setRemovingMemberId] = useState<string | null>(null);
   const [exiting, setExiting] = useState(false);
+  const [memberEdits, setMemberEdits] = useState<Record<string, string>>({});
 
-  const loadSettings = useCallback(async () => {
-    await refreshGroupRosterFromServer(db, groupId);
-    const group = await getGroup(db, groupId);
-    if (!group) {
-      setError("Group not found");
+  const referencedMemberIds = useMemo(
+    () => new Set(referencedRows.map((row) => row.member_id)),
+    [referencedRows]
+  );
+
+  useEffect(() => {
+    if (!group || groupNameDirty) {
       return;
     }
 
-    const knownGroups = await getKnownGroups();
-    const knownGroup = knownGroups.find((entry) => entry.groupId === groupId);
-    const memberIds = group.members.map((member) => member.id);
-    const referencedFlags = await Promise.all(
-      group.members.map((member) => isMemberReferenced(db, member.id))
-    );
-
     setGroupName(group.name);
-    setGroupNameDirty(false);
-    setAssumedMemberId(resolveAssumedMemberId(knownGroup, memberIds));
-    setMembers(
-      group.members.map((member, index) => ({
-        ...member,
-        editName: member.displayName,
-        referenced: referencedFlags[index] ?? false,
-      }))
-    );
-    setError(null);
-  }, [db, groupId]);
+  }, [group, groupNameDirty]);
 
-  useFocusEffect(
-    useCallback(() => {
-      void loadSettings();
-    }, [loadSettings])
-  );
-
-  useOnTablesChange(db, ["groups", "members"], () => {
-    if (!groupNameDirty && !savingName) {
-      void loadSettings();
+  useEffect(() => {
+    if (!group) {
+      return;
     }
-  });
+
+    void getKnownGroups().then((knownGroups) => {
+      const knownGroup = knownGroups.find((entry) => entry.groupId === groupId);
+      const memberIds = group.members.map((member) => member.id);
+      setAssumedMemberId(resolveAssumedMemberId(knownGroup, memberIds));
+    });
+  }, [group, groupId]);
+
+  useEffect(() => {
+    if (!group) {
+      return;
+    }
+
+    setMemberEdits((current) => {
+      const next = { ...current };
+      for (const member of group.members) {
+        if (!(member.id in next)) {
+          next[member.id] = member.displayName;
+        }
+      }
+      return next;
+    });
+  }, [group]);
+
+  const members = useMemo((): MemberRowState[] => {
+    if (!group) {
+      return [];
+    }
+
+    return group.members.map((member) => ({
+      ...member,
+      editName: memberEdits[member.id] ?? member.displayName,
+      referenced: referencedMemberIds.has(member.id),
+    }));
+  }, [group, memberEdits, referencedMemberIds]);
+
+  const updateMemberEdit = useCallback((memberId: string, editName: string) => {
+    setMemberEdits((current) => ({ ...current, [memberId]: editName }));
+  }, []);
 
   async function syncChanges(): Promise<void> {
     if (isSyncConfigured()) {
@@ -99,9 +131,9 @@ export function GroupSettingsScreen({ navigation, route }: Props) {
     setError(null);
 
     try {
-      const updated = await renameGroup(db, groupId, groupName);
-      setGroupName(updated.name);
+      await renameGroup(db, groupId, groupName.trim());
       await syncChanges();
+      setGroupNameDirty(false);
     } catch (cause: unknown) {
       const message =
         cause instanceof Error ? cause.message : "Could not rename group";
@@ -116,10 +148,9 @@ export function GroupSettingsScreen({ navigation, route }: Props) {
     setError(null);
 
     try {
-      await addMember(db, groupId, newMemberName);
-      setNewMemberName("");
+      await addMember(db, groupId, newMemberName.trim());
       await syncChanges();
-      await loadSettings();
+      setNewMemberName("");
     } catch (cause: unknown) {
       const message =
         cause instanceof Error ? cause.message : "Could not add member";
@@ -129,14 +160,14 @@ export function GroupSettingsScreen({ navigation, route }: Props) {
     }
   }
 
-  async function handleRenameMember(member: MemberRowState) {
-    setRenamingMemberId(member.id);
+  async function handleRenameMember(memberId: string) {
+    setRenamingMemberId(memberId);
     setError(null);
 
     try {
-      await renameMember(db, member.id, member.editName);
+      const editName = memberEdits[memberId]?.trim() ?? "";
+      await renameMember(db, memberId, editName);
       await syncChanges();
-      await loadSettings();
     } catch (cause: unknown) {
       const message =
         cause instanceof Error ? cause.message : "Could not rename member";
@@ -153,7 +184,6 @@ export function GroupSettingsScreen({ navigation, route }: Props) {
     try {
       await removeMember(db, memberId);
       await syncChanges();
-      await loadSettings();
     } catch (cause: unknown) {
       const message =
         cause instanceof Error ? cause.message : "Could not remove member";
@@ -163,17 +193,10 @@ export function GroupSettingsScreen({ navigation, route }: Props) {
     }
   }
 
-  async function handleAssume(memberId: string | null) {
+  async function handleAssumedMemberChange(memberId: string | null) {
     setError(null);
-
-    try {
-      await setAssumedMember(groupId, memberId);
-      setAssumedMemberId(memberId);
-    } catch (cause: unknown) {
-      const message =
-        cause instanceof Error ? cause.message : "Could not save assumption";
-      setError(message);
-    }
+    await setAssumedMember(groupId, memberId);
+    setAssumedMemberId(memberId);
   }
 
   async function handleExitGroup() {
@@ -187,86 +210,96 @@ export function GroupSettingsScreen({ navigation, route }: Props) {
       const message =
         cause instanceof Error ? cause.message : "Could not exit group";
       setError(message);
+    } finally {
       setExiting(false);
     }
+  }
+
+  if (!group) {
+    return (
+      <View style={styles.container}>
+        <Text variant="bodyMedium">Group not found</Text>
+      </View>
+    );
   }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text variant="headlineSmall">Group Settings</Text>
-
-      <Text variant="titleMedium">Group name</Text>
       <TextInput
         label="Group name"
-        accessibilityLabel="Group name"
         value={groupName}
         onChangeText={(value) => {
-          setGroupNameDirty(true);
           setGroupName(value);
+          setGroupNameDirty(true);
         }}
         testID="settings-group-name-input"
-        autoCapitalize="words"
       />
       <Button
         mode="contained"
         onPress={() => void handleSaveName()}
         loading={savingName}
-        disabled={savingName}
+        disabled={savingName || !groupNameDirty}
         testID="save-group-name-button"
       >
         Save name
       </Button>
-
+      <Text variant="titleMedium">Assumed member</Text>
+      {group.members.map((member) => (
+        <Button
+          key={member.id}
+          mode={assumedMemberId === member.id ? "contained" : "outlined"}
+          onPress={() => void handleAssumedMemberChange(member.id)}
+          testID={`assume-member-${member.id}`}
+        >
+          {member.displayName}
+        </Button>
+      ))}
+      <Button
+        mode={assumedMemberId === null ? "contained" : "outlined"}
+        onPress={() => void handleAssumedMemberChange(null)}
+        testID="assume-member-none"
+      >
+        None
+      </Button>
       <Text variant="titleMedium">Members</Text>
       {members.map((member) => (
         <View key={member.id} style={styles.memberRow}>
           <TextInput
-            label={member.displayName}
-            accessibilityLabel={`Rename ${member.displayName}`}
+            label="Member name"
             value={member.editName}
-            onChangeText={(value) =>
-              setMembers((current) =>
-                current.map((row) =>
-                  row.id === member.id ? { ...row, editName: value } : row
-                )
-              )
-            }
+            onChangeText={(value) => updateMemberEdit(member.id, value)}
             testID={`member-name-input-${member.id}`}
-            autoCapitalize="words"
           />
-          <View style={styles.memberActions}>
-            <Button
-              mode="outlined"
-              onPress={() => void handleRenameMember(member)}
-              loading={renamingMemberId === member.id}
-              disabled={renamingMemberId !== null || removingMemberId !== null}
-              testID={`rename-member-${member.id}`}
-            >
-              Rename
-            </Button>
-            <Button
-              mode="outlined"
-              onPress={() => void handleRemoveMember(member.id)}
-              loading={removingMemberId === member.id}
-              disabled={
-                member.referenced ||
-                renamingMemberId !== null ||
-                removingMemberId !== null
-              }
-              testID={`remove-member-${member.id}`}
-            >
-              Remove
-            </Button>
-          </View>
+          <Button
+            mode="outlined"
+            onPress={() => void handleRenameMember(member.id)}
+            loading={renamingMemberId === member.id}
+            disabled={renamingMemberId !== null || removingMemberId !== null}
+            testID={`rename-member-${member.id}`}
+          >
+            Rename
+          </Button>
+          <Button
+            mode="outlined"
+            onPress={() => void handleRemoveMember(member.id)}
+            loading={removingMemberId === member.id}
+            disabled={
+              member.referenced ||
+              renamingMemberId !== null ||
+              removingMemberId !== null
+            }
+            testID={`remove-member-${member.id}`}
+          >
+            Remove
+          </Button>
         </View>
       ))}
       <TextInput
         label="New member"
-        accessibilityLabel="New member"
         value={newMemberName}
         onChangeText={setNewMemberName}
         testID="new-member-input"
-        autoCapitalize="words"
       />
       <Button
         mode="contained"
@@ -277,31 +310,8 @@ export function GroupSettingsScreen({ navigation, route }: Props) {
       >
         Add member
       </Button>
-
-      <Text variant="titleMedium">Assumed member</Text>
-      <View style={styles.memberChoices}>
-        <Button
-          mode={assumedMemberId === null ? "contained" : "outlined"}
-          onPress={() => void handleAssume(null)}
-          testID="assume-none"
-        >
-          None
-        </Button>
-        {members.map((member) => (
-          <Button
-            key={member.id}
-            mode={assumedMemberId === member.id ? "contained" : "outlined"}
-            onPress={() => void handleAssume(member.id)}
-            testID={`assume-${member.id}`}
-          >
-            {member.displayName}
-          </Button>
-        ))}
-      </View>
-
       <Button
         mode="contained"
-        buttonColor="#b3261e"
         onPress={() => void handleExitGroup()}
         loading={exiting}
         disabled={exiting}
@@ -309,7 +319,6 @@ export function GroupSettingsScreen({ navigation, route }: Props) {
       >
         Exit group
       </Button>
-
       {error ? (
         <Text variant="bodySmall" style={styles.error}>
           {error}
@@ -330,16 +339,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   memberRow: {
-    gap: 8,
-  },
-  memberActions: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  memberChoices: {
-    flexDirection: "row",
-    flexWrap: "wrap",
     gap: 8,
   },
   error: {

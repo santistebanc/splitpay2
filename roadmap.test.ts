@@ -2,18 +2,19 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 describe("project roadmap docs", () => {
-  it("documents roadmap through S29 and the dev process", () => {
+  it("documents roadmap through S30 and the dev process", () => {
     const roadmap = readFileSync("docs/ROADMAP.md", "utf8");
     const process = readFileSync("docs/PROCESS.md", "utf8");
     const slices = readFileSync("docs/SLICES.md", "utf8");
 
     expect(roadmap).toContain("S29");
-    expect(roadmap).toContain("no slice marked **Next**");
+    expect(roadmap).toContain("S30");
+    expect(roadmap).toContain("S31");
     expect(process).toContain("npm run verify");
     expect(process).toContain("confirmed");
     expect(slices).toContain("ROADMAP.md");
     expect(slices).toContain("PROCESS.md");
-    expect(slices).toContain("S29");
+    expect(slices).toContain("S30");
 
     const cursorRule = readFileSync(
       ".cursor/rules/splitpay-development.mdc",

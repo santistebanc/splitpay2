@@ -2,7 +2,7 @@ import { Platform, useColorScheme } from "react-native";
 import { useEffect, useState } from "react";
 
 function readWebColorScheme(): "light" | "dark" {
-  if (typeof window === "undefined") {
+  if (Platform.OS !== "web" || typeof window.matchMedia !== "function") {
     return "light";
   }
   return window.matchMedia("(prefers-color-scheme: dark)").matches
@@ -13,7 +13,7 @@ function readWebColorScheme(): "light" | "dark" {
 /** Resolved app color scheme — on web uses `prefers-color-scheme` directly. */
 export function useAppColorScheme(): "light" | "dark" {
   const nativeScheme = useColorScheme();
-  const [webScheme, setWebScheme] = useState(readWebColorScheme);
+  const [webScheme, setWebScheme] = useState(() => readWebColorScheme());
 
   useEffect(() => {
     if (Platform.OS !== "web") {

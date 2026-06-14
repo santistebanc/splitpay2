@@ -1,49 +1,35 @@
 import { useFocusEffect } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { computeBalances } from "@splitpay/ledger";
-import { useCallback, useState } from "react";
+import { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import { Button, Text } from "react-native-paper";
 
-import type { ExpenseRecord } from "../db/add-expense";
-import { getGroup } from "../db/create-group";
-import { useDatabase } from "../db/DatabaseProvider";
-import { refreshGroupRosterFromServer } from "../db/join-group";
-import type { ActivityRecord } from "../db/list-group-activities";
-import { listGroupActivities } from "../db/list-group-activities";
-import { listGroupExpenses } from "../db/list-group-expenses";
-import { useOnTablesChange } from "../db/use-on-tables-change";
+import {
+  useGroupActivities,
+  useGroupExpenses,
+} from "../db/hooks/use-group-queries";
+import { useGroupWithMembers } from "../db/hooks/use-group-with-members";
+import { useSyncOnFocus } from "../db/hooks/use-sync-on-focus";
 import { formatAmountCents, formatBalanceCents } from "../lib/format-balance";
 import type { RootStackParamList } from "../navigation/routes";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Group">;
 
-type BalanceRow = {
-  memberId: string;
-  displayName: string;
-  balanceCents: number;
-};
-
 export function GroupScreen({ navigation, route }: Props) {
   const { groupId } = route.params;
-  const db = useDatabase();
-  const [groupName, setGroupName] = useState("");
-  const [currency, setCurrency] = useState("EUR");
-  const [balances, setBalances] = useState<BalanceRow[]>([]);
-  const [expenses, setExpenses] = useState<ExpenseRecord[]>([]);
-  const [activities, setActivities] = useState<ActivityRecord[]>([]);
 
-  const loadGroup = useCallback(async () => {
-    await refreshGroupRosterFromServer(db, groupId);
-    const group = await getGroup(db, groupId);
+  useSyncOnFocus(groupId);
+
+  const { group } = useGroupWithMembers(groupId);
+  const { expenses } = useGroupExpenses(groupId);
+  const { activities } = useGroupActivities(groupId);
+
+  const balances = useMemo(() => {
     if (!group) {
-      return;
+      return [];
     }
 
-    const [expenses, groupActivities] = await Promise.all([
-      listGroupExpenses(db, groupId),
-      listGroupActivities(db, groupId),
-    ]);
     const ledgerBalances = computeBalances(
       group.members.map((member) => ({ id: member.id })),
       expenses.map((expense) => ({
@@ -63,39 +49,15 @@ export function GroupScreen({ navigation, route }: Props) {
       group.members.map((member) => [member.id, member.displayName])
     );
 
-    setGroupName(group.name);
-    setCurrency(group.currency);
-    setExpenses(expenses);
-    setActivities(groupActivities);
-    setBalances(
-      ledgerBalances.map((balance) => ({
-        memberId: balance.memberId,
-        displayName: membersById.get(balance.memberId) ?? balance.memberId,
-        balanceCents: balance.balanceCents,
-      }))
-    );
-  }, [db, groupId]);
+    return ledgerBalances.map((balance) => ({
+      memberId: balance.memberId,
+      displayName: membersById.get(balance.memberId) ?? balance.memberId,
+      balanceCents: balance.balanceCents,
+    }));
+  }, [group, expenses]);
 
-  useFocusEffect(
-    useCallback(() => {
-      void loadGroup();
-    }, [loadGroup])
-  );
-
-  useOnTablesChange(
-    db,
-    [
-      "groups",
-      "members",
-      "expenses",
-      "expense_contributions",
-      "expense_allocations",
-      "activities",
-    ],
-    () => {
-      void loadGroup();
-    }
-  );
+  const groupName = group?.name ?? "";
+  const currency = group?.currency ?? "EUR";
 
   return (
     <View style={styles.container}>

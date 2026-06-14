@@ -10,12 +10,18 @@
       "userInterfaceStyle": "automatic"
     },
     "android": {
-      "userInterfaceStyle": "automatic"
+      "userInterfaceStyle": "automatic",
+      "usesCleartextTraffic": true,
+      "package": "com.santistebanc.splitpay"
     },
     "web": {
       "bundler": "metro",
       "output": "single"
     },
-    "plugins": ["expo-status-bar"]
+    "plugins": [
+      "expo-status-bar",
+      "@journeyapps/react-native-quick-sqlite",
+      "./plugins/withGradleMemory.js"
+    ]
   }
 }

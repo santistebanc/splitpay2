@@ -1,14 +1,13 @@
-import { useFocusEffect } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useCallback, useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
 
 import { addExpense } from "../db/add-expense";
 import { flushPendingUploads } from "../db/connect-sync";
-import { getGroup, type GroupWithMembers } from "../db/create-group";
 import { useDatabase } from "../db/DatabaseProvider";
-import { refreshGroupRosterFromServer } from "../db/join-group";
+import { useGroupWithMembers } from "../db/hooks/use-group-with-members";
+import { useSyncOnFocus } from "../db/hooks/use-sync-on-focus";
 import { isSyncConfigured } from "../db/sync-config";
 import { parseAmountToCents } from "../lib/parse-amount";
 import type { RootStackParamList } from "../navigation/routes";
@@ -18,25 +17,21 @@ type Props = NativeStackScreenProps<RootStackParamList, "AddExpense">;
 export function AddExpenseScreen({ navigation, route }: Props) {
   const { groupId } = route.params;
   const db = useDatabase();
-  const [group, setGroup] = useState<GroupWithMembers | null>(null);
+
+  useSyncOnFocus(groupId);
+
+  const { group } = useGroupWithMembers(groupId);
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
   const [paidByMemberId, setPaidByMemberId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  useFocusEffect(
-    useCallback(() => {
-      void (async () => {
-        await refreshGroupRosterFromServer(db, groupId);
-        const loaded = await getGroup(db, groupId);
-        setGroup(loaded);
-        if (loaded?.members[0]) {
-          setPaidByMemberId((current) => current ?? loaded.members[0]!.id);
-        }
-      })();
-    }, [db, groupId])
-  );
+  useEffect(() => {
+    if (group?.members[0]) {
+      setPaidByMemberId((current) => current ?? group.members[0]!.id);
+    }
+  }, [group]);
 
   async function handleSave() {
     const amountCents = parseAmountToCents(amount);

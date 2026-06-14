@@ -91,7 +91,12 @@ Playwright starts at S17. Manual checklist in each slice doc.
 
 Post-S28 hardening (upload + live UI): [`slices/sync-upload-hardening.md`](./slices/sync-upload-hardening.md)
 
-**Beyond S29:** no slice marked **Next** yet. Candidates: native builds, production Supabase/PowerSync deploy, real auth.
+**Beyond S30:** see **S31** (remote dev/staging stack).
+
+| Slice   | Status | Summary                            | Exit criteria                               |
+| ------- | ------ | ---------------------------------- | ------------------------------------------- |
+| **S30** | ✅     | Native SQLite + `useQuery` live UI | Dev build sync; screens use watched queries |
+| **S31** | 🔜     | Remote Supabase + PowerSync (dev)  | App syncs against hosted stack via env      |
 
 Integration CI: `.github/workflows/sync-integration.yml` (Supabase + PowerSync in Docker on GitHub Actions).
 

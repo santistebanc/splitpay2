@@ -13,3 +13,5 @@ sync-a-*.db*
 sync-b-*.db*
 splitpay-*.db*
 debug-sync.db*
+apps/mobile/android/
+apps/mobile/ios/

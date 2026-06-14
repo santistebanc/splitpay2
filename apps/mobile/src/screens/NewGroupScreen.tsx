@@ -3,7 +3,10 @@ import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
 
-import { flushPendingUploads } from "../db/connect-sync";
+import {
+  flushPendingUploads,
+  reconnectSyncIfConfigured,
+} from "../db/connect-sync";
 import { createGroup } from "../db/create-group";
 import { useDatabase } from "../db/DatabaseProvider";
 import { isSyncConfigured } from "../db/sync-config";
@@ -49,6 +52,7 @@ export function NewGroupScreen({ navigation }: Props) {
       });
       if (isSyncConfigured()) {
         await flushPendingUploads(db);
+        await reconnectSyncIfConfigured(db);
       }
       await addKnownGroup(group.id);
       navigation.goBack();

@@ -26,9 +26,43 @@ export async function connectSyncIfConfigured(
     return false;
   }
 
+  if (!(await isPowerSyncReachable(config.powersyncUrl))) {
+    return false;
+  }
+
   await ensureSupabaseSession(config);
   await db.connect(createSupabaseConnector(config, getSupabaseClient(config)));
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), SYNC_WAIT_MS);
+  try {
+    await db.waitForFirstSync(controller.signal);
+  } finally {
+    clearTimeout(timeout);
+  }
+
   return true;
+}
+
+/** Reconnects when sync is configured but the client is offline. */
+export async function ensureSyncConnected(
+  db: AbstractPowerSyncDatabase
+): Promise<boolean> {
+  const config = getSyncConfig();
+  if (!config) {
+    return false;
+  }
+
+  const status = db.currentStatus;
+  if (
+    db.connected &&
+    status.connected &&
+    status.dataFlowStatus.downloadError == null
+  ) {
+    return true;
+  }
+
+  return reconnectSyncIfConfigured(db);
 }
 
 /** Pushes all queued local writes to Supabase when sync env vars are set. */

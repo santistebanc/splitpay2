@@ -32,6 +32,20 @@ test("joins a group by code and shows it on the home screen", async ({
 }) => {
   test.setTimeout(60_000);
 
+  await page.route("**/auth/v1/signup**", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        access_token: "e2e-token",
+        token_type: "bearer",
+        expires_in: 3600,
+        refresh_token: "e2e-refresh",
+        user: { id: "e2e-user", aud: "authenticated", role: "authenticated" },
+      }),
+    });
+  });
+
   await page.route("**/functions/v1/join", async (route) => {
     await route.fulfill({
       status: 200,

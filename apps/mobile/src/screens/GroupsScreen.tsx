@@ -1,13 +1,11 @@
 import { useFocusEffect } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useCallback, useEffect, useState } from "react";
-import { FlatList, Pressable, StyleSheet, View } from "react-native";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { FlatList, Platform, Pressable, StyleSheet, View } from "react-native";
 import { Button, Text } from "react-native-paper";
 
-import type { GroupRecord } from "../db/create-group";
-import { useDatabase } from "../db/DatabaseProvider";
-import { listGroups } from "../db/list-groups";
-import { useOnTablesChange } from "../db/use-on-tables-change";
+import { useAllGroups } from "../db/hooks/use-group-with-members";
+import { useSyncOnFocus } from "../db/hooks/use-sync-on-focus";
 import { getKnownGroups } from "../lib/known-groups";
 import { STORAGE_KEYS } from "../lib/storage-keys";
 import type { RootStackParamList } from "../navigation/routes";
@@ -15,42 +13,41 @@ import type { RootStackParamList } from "../navigation/routes";
 type Props = NativeStackScreenProps<RootStackParamList, "Groups">;
 
 export function GroupsScreen({ navigation }: Props) {
-  const db = useDatabase();
-  const [groups, setGroups] = useState<GroupRecord[]>([]);
+  useSyncOnFocus();
 
-  const loadGroups = useCallback(async () => {
-    const [allGroups, knownGroups] = await Promise.all([
-      listGroups(db),
-      getKnownGroups(),
-    ]);
-    const knownIds = new Set(knownGroups.map((group) => group.groupId));
-    setGroups(allGroups.filter((group) => knownIds.has(group.id)));
-  }, [db]);
+  const { groups: allGroups } = useAllGroups();
+  const [knownIds, setKnownIds] = useState<ReadonlySet<string>>(new Set());
+
+  const refreshKnownGroups = useCallback(async () => {
+    const knownGroups = await getKnownGroups();
+    setKnownIds(new Set(knownGroups.map((group) => group.groupId)));
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
-      void loadGroups();
-    }, [loadGroups])
+      void refreshKnownGroups();
+    }, [refreshKnownGroups])
   );
 
-  useOnTablesChange(db, ["groups", "members"], () => {
-    void loadGroups();
-  });
-
   useEffect(() => {
-    if (typeof window === "undefined") {
+    if (Platform.OS !== "web") {
       return;
     }
 
     const onStorage = (event: StorageEvent) => {
       if (event.key === STORAGE_KEYS.knownGroups) {
-        void loadGroups();
+        void refreshKnownGroups();
       }
     };
 
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
-  }, [loadGroups]);
+  }, [refreshKnownGroups]);
+
+  const groups = useMemo(
+    () => allGroups.filter((group) => knownIds.has(group.id)),
+    [allGroups, knownIds]
+  );
 
   return (
     <View style={styles.container}>
