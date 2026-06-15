@@ -8,7 +8,8 @@
     "start:tunnel": "node ../../node_modules/expo/bin/cli start --tunnel",
     "android": "node ../../node_modules/expo/bin/cli run:android",
     "web": "node ../../node_modules/expo/bin/cli start --web --port 8081",
-    "web:sync": "EXPO_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321 EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0 EXPO_PUBLIC_POWERSYNC_URL=http://127.0.0.1:8080 node ../../node_modules/expo/bin/cli start --web --port 8081",
+    "web:env": "node ../../node_modules/expo/bin/cli start --web --port 8081",
+    "web:sync": "bash ../../scripts/with-env.sh ../../env/local.keys node ../../node_modules/expo/bin/cli start --web --port 8081",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

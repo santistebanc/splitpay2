@@ -1,0 +1,13 @@
+# Remote dev/staging stack (hosted Supabase + PowerSync Cloud).
+# Copy and fill in from your dev project dashboard:
+#   cp env/dev.example env/dev.local
+#
+# Never commit env/dev.local — it is gitignored.
+
+EXPO_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+EXPO_PUBLIC_POWERSYNC_URL=https://YOUR_INSTANCE.powersync.journeyapps.com
+
+# Used by deploy scripts (not bundled into the Expo app):
+# SUPABASE_PROJECT_REF=your_project_ref
+# SUPABASE_ACCESS_TOKEN=optional_if_already_logged_in_via_cli

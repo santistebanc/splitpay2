@@ -1,0 +1,11 @@
+# Local Supabase + PowerSync (Docker on your machine).
+#
+# Working defaults (Supabase CLI demo credentials) live in env/local.keys.
+# Quick start:
+#   cp env/local.keys env/local.local
+#
+# Or copy this template and set the anon key from `supabase status`.
+
+EXPO_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+EXPO_PUBLIC_SUPABASE_ANON_KEY=
+EXPO_PUBLIC_POWERSYNC_URL=http://127.0.0.1:8080

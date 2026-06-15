@@ -2,13 +2,15 @@
 
 Micro-slices for gradual, test-driven development.
 
-**Next slice:** [S31 — Remote Supabase + PowerSync (dev)](./ROADMAP.md#sync--join--s25s29)
+**Next slice:** [S32 — Dev deploy automation](./ROADMAP.md#sync--join--s25s29)
 
 **How we work:** [`PROCESS.md`](./PROCESS.md)
 
 **Manual sync testing:** [`MANUAL-SYNC-TESTING.md`](./MANUAL-SYNC-TESTING.md)
 
 **Phone (Expo Go):** [`MOBILE-DEV.md`](./MOBILE-DEV.md)
+
+**Remote dev stack:** [`REMOTE-DEV.md`](./REMOTE-DEV.md)
 
 ## Completed
 
@@ -45,12 +47,13 @@ Micro-slices for gradual, test-driven development.
 | [S28](slices/S28-join-group-ui.md)                | Join Group UI                              |
 | [S29](slices/S29-two-device-sync-e2e.md)          | Two-device sync e2e + CI                   |
 | [S30](slices/S30-native-sync-ui.md)               | Native SQLite + useQuery live UI           |
+| [S31](slices/S31-remote-dev-stack.md)             | Remote dev Supabase + PowerSync env        |
 | [Sync hardening](slices/sync-upload-hardening.md) | Upload + live UI fixes (post-S28)          |
 | [Prep](slices/prep-roadmap-and-process.md)        | Roadmap, process, ADRs                     |
 
 ## Upcoming
 
-See [`ROADMAP.md`](./ROADMAP.md) — **Next:** S31 remote dev stack.
+See [`ROADMAP.md`](./ROADMAP.md) — **Next:** S32 dev deploy automation.
 
 ## Verify
 

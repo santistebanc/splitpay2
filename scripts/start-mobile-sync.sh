@@ -3,7 +3,12 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 LAN_IP="$(bash "$ROOT/scripts/lan-ip.sh")"
-SUPABASE_ANON_KEY="${SUPABASE_ANON_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0}"
+
+if [[ -z "${SUPABASE_ANON_KEY:-}" && -f "$ROOT/env/local.keys" ]]; then
+  SUPABASE_ANON_KEY="$(
+    grep '^EXPO_PUBLIC_SUPABASE_ANON_KEY=' "$ROOT/env/local.keys" | head -1 | cut -d= -f2-
+  )"
+fi
 
 echo "Sync URLs for phone (same Wi‑Fi as this machine):"
 echo "  Supabase:  http://${LAN_IP}:54321"

@@ -86,7 +86,10 @@ If join fails with network errors, the phone still cannot reach the stack — fi
 | `npm run mobile`               | Expo dev server (LAN)                                  |
 | `npm run mobile:tunnel`        | Expo via tunnel — **recommended on WSL2**              |
 | `npm run mobile:dev`           | Tunnel + `adb reverse` for installed **dev build**     |
-| `npm run mobile:sync`          | Tunnel + Supabase/PowerSync env for phone              |
+| `npm run mobile:sync`          | Tunnel + local Supabase/PowerSync on your PC           |
+| `npm run mobile:remote`        | Tunnel + **hosted dev** stack (`env/dev.local`)        |
+| `npm run web:dev`              | Web → hosted dev stack                                 |
+| `npm run deploy:dev`           | Push migrations + join function to linked Supabase     |
 | `npm run mobile:android`       | Build + install native dev app (Windows `C:\` clone)   |
 | `npm run mobile:android:win`   | Same build, triggered from WSL via `cmd.exe`           |
 | `npm run mobile:adb:qr`        | Pair phone to ADB over Wi‑Fi via QR code (Android 11+) |
@@ -109,7 +112,7 @@ PowerSync’s own docs call `@powersync/adapter-sql-js` an **alpha dev adapter**
 | Download from PowerSync | ✓ (SharedWorker sync) | ✗ unreliable             |
 | Live UI on sync         | ✓                     | ✗ unreliable             |
 
-**For reliable two-device sync today:** use two browser tabs (`npm run web:sync`) or build a **development build** with native SQLite (see below).
+**For reliable two-device sync today:** use two browser tabs (`npm run web:sync`), a **hosted dev stack** (`npm run web:dev` + `npm run mobile:remote` — see [`REMOTE-DEV.md`](./REMOTE-DEV.md)), or build a **development build** with native SQLite (see below).
 
 ## Troubleshooting
 

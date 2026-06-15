@@ -10,11 +10,12 @@ describe("project roadmap docs", () => {
     expect(roadmap).toContain("S29");
     expect(roadmap).toContain("S30");
     expect(roadmap).toContain("S31");
+    expect(roadmap).toContain("S32");
     expect(process).toContain("npm run verify");
     expect(process).toContain("confirmed");
     expect(slices).toContain("ROADMAP.md");
     expect(slices).toContain("PROCESS.md");
-    expect(slices).toContain("S30");
+    expect(slices).toContain("S31");
 
     const cursorRule = readFileSync(
       ".cursor/rules/splitpay-development.mdc",

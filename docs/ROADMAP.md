@@ -93,10 +93,11 @@ Post-S28 hardening (upload + live UI): [`slices/sync-upload-hardening.md`](./sli
 
 **Beyond S30:** see **S31** (remote dev/staging stack).
 
-| Slice   | Status | Summary                            | Exit criteria                               |
-| ------- | ------ | ---------------------------------- | ------------------------------------------- |
-| **S30** | ✅     | Native SQLite + `useQuery` live UI | Dev build sync; screens use watched queries |
-| **S31** | 🔜     | Remote Supabase + PowerSync (dev)  | App syncs against hosted stack via env      |
+| Slice   | Status | Summary                             | Exit criteria                               |
+| ------- | ------ | ----------------------------------- | ------------------------------------------- |
+| **S30** | ✅     | Native SQLite + `useQuery` live UI  | Dev build sync; screens use watched queries |
+| **S31** | ✅     | Remote Supabase + PowerSync (dev)   | App syncs against hosted stack via env      |
+| **S32** | 🔜     | Dev deploy automation + docs polish | Optional GH deploy secrets documented       |
 
 Integration CI: `.github/workflows/sync-integration.yml` (Supabase + PowerSync in Docker on GitHub Actions).
 
